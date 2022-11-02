@@ -53,7 +53,7 @@ void wait_for_ctrl_c(void);
 void Heavy_Work(void);                 /* Load task */
 void processing_task_code(void *args); /* Task body */
 void sensor_task_code(void *args);     /* Task body */
-void storage_task_code(void *args);     /* Task body */
+void storage_task_code(void *args);    /* Task body */
 
 /* ******************
  * Main function
@@ -119,42 +119,27 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void storage_task_code(void *args) {
-    u_int16_t a1 = 1;
-    u_int16_t a2 = 2;
-    u_int16_t a3 = 3;
-    u_int16_t a4 = 4;
-    u_int16_t a5 = 5;
-    u_int16_t a6 = 6;
+void storage_task_code(void *args)
+{
     FILE *sensor_data = fopen("newSensorData.txt", "w");
-    fwrite(&a1, sizeof(a1), 1, sensor_data);
-    fwrite("\n", sizeof(char), 1, sensor_data);
-    fwrite(&a2, sizeof(a2), 1, sensor_data);
-    fwrite("\n", sizeof(char), 1, sensor_data);
-    fwrite(&a3, sizeof(a3), 1, sensor_data);
-    fwrite("\n", sizeof(char), 1, sensor_data);
-    fwrite(&a4, sizeof(a4), 1, sensor_data);
-    fwrite("\n", sizeof(char), 1, sensor_data);
-    fwrite(&a5, sizeof(a5), 1, sensor_data);
-    fwrite("\n", sizeof(char), 1, sensor_data);
-    fwrite(&a6, sizeof(a6), 1, sensor_data);
-    fwrite("\n", sizeof(char), 1, sensor_data);
+
     fclose(sensor_data);
 }
 
-
 void processing_task_code(void *args)
 {
-    FILE *sensor_file = fopen("newSensorData.txt", "r");
+    FILE *sensor_file = fopen("sensorData.txt", "r");
     if (sensor_file != NULL)
     {
+        int i = 0;
         while (!feof(sensor_file))
         {
 
             u_int16_t sensor_data;
             fread(&sensor_data, sizeof(sensor_data), 1, sensor_file);
-            char new_line = fgetc(sensor_file);
-            printf("data: %d\n", sensor_data);
+            //char new_line = fgetc(sensor_file);
+            printf("data %d: %d\n", i, sensor_data);
+            i++;
         }
     }
     fclose(sensor_file);
