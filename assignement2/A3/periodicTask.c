@@ -53,6 +53,7 @@ void wait_for_ctrl_c(void);
 void Heavy_Work(void);                 /* Load task */
 void processing_task_code(void *args); /* Task body */
 void sensor_task_code(void *args);     /* Task body */
+void storage_task_code(void *args);     /* Task body */
 
 /* ******************
  * Main function
@@ -110,7 +111,7 @@ int main(int argc, char *argv[])
     rt_task_set_affinity(&storage_task, &cpus);
     rt_task_start(&sensor_task, &sensor_task_code, (void *)&taskAArgs);
     rt_task_start(&processing_task, &processing_task_code, (void *)&taskBArgs);
-    rt_task_start(&storage_task, &sensor_task_code, (void *)&taskCArgs);
+    rt_task_start(&storage_task, &storage_task_code, (void *)&taskCArgs);
 
     /* wait for termination signal */
     wait_for_ctrl_c();
@@ -118,21 +119,41 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+void storage_task_code(void *args) {
+    u_int16_t a1 = 1;
+    u_int16_t a2 = 2;
+    u_int16_t a3 = 3;
+    u_int16_t a4 = 4;
+    u_int16_t a5 = 5;
+    u_int16_t a6 = 6;
+    FILE *sensor_data = fopen("newSensorData.txt", "w");
+    fwrite(&a1, sizeof(a1), 1, sensor_data);
+    fwrite("\n", sizeof(char), 1, sensor_data);
+    fwrite(&a2, sizeof(a2), 1, sensor_data);
+    fwrite("\n", sizeof(char), 1, sensor_data);
+    fwrite(&a3, sizeof(a3), 1, sensor_data);
+    fwrite("\n", sizeof(char), 1, sensor_data);
+    fwrite(&a4, sizeof(a4), 1, sensor_data);
+    fwrite("\n", sizeof(char), 1, sensor_data);
+    fwrite(&a5, sizeof(a5), 1, sensor_data);
+    fwrite("\n", sizeof(char), 1, sensor_data);
+    fwrite(&a6, sizeof(a6), 1, sensor_data);
+    fwrite("\n", sizeof(char), 1, sensor_data);
+    fclose(sensor_data);
+}
+
+
 void processing_task_code(void *args)
 {
-    FILE *sensor_data = fopen("sensorData.txt", "r");
-    if (sensor_data != NULL)
+    FILE *sensor_file = fopen("newSensorData.txt", "r");
+    if (sensor_file != NULL)
     {
-        while (!feof(sensor_data))
+        while (!feof(sensor_file))
         {
-
-            char highByteChar = fgetc(sensor_data);
-            char lowByteChar = fgetc(sensor_data);
-            int highByte = highByteChar - 48;
-            int lowByte = lowByteChar - 48;
-            u_int16_t current_data = (highByte << 8) | lowByte;
-            char new_line = fgetc(sensor_data);
-            printf("data: %d\n", current_data);
+            char* sensor_read = calloc(3, sizeof(char)); 
+            fgets(sensor_read, 10, sensor_file);
+            u_int16_t current_data = strtol(sensor_read, NULL, 16);
+            printf("data: %x\n", current_data);
         }
     }
     fclose(sensor_data);
