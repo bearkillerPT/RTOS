@@ -26,7 +26,7 @@
 struct taskArgsStruct
 {
     RTIME taskPeriod_ns;
-    char* taskName;
+    char *taskName;
 };
 
 /* *******************
@@ -100,6 +100,12 @@ int main(int argc, char *argv[])
     taskBArgs.taskName = "TASK B";
     taskCArgs.taskPeriod_ns = TASK_C_PERIOD_NS;
     taskCArgs.taskName = "TASK C";
+    cpu_set_t cpus;
+    CPU_ZERO(&cpus);
+    CPU_SET(0, &cpus);
+    rt_task_set_affinity(&task_a_desc, &cpus);
+    rt_task_set_affinity(&task_b_desc, &cpus);
+    rt_task_set_affinity(&task_c_desc, &cpus);
     rt_task_start(&task_a_desc, &task_code, (void *)&taskAArgs);
     rt_task_start(&task_b_desc, &task_code, (void *)&taskBArgs);
     rt_task_start(&task_c_desc, &task_code, (void *)&taskCArgs);
@@ -127,7 +133,7 @@ void task_code(void *args)
     curtask = rt_task_self();
     rt_task_inquire(curtask, &curtaskinfo);
     taskArgs = (struct taskArgsStruct *)args;
-    char* proc_task_name = calloc(100, sizeof(char));
+    char *proc_task_name = calloc(100, sizeof(char));
     strcpy(proc_task_name, curtaskinfo.name);
     strcat(proc_task_name, " - ");
     strcat(proc_task_name, taskArgs->taskName);
