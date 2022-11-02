@@ -17,6 +17,7 @@
 // Xenomai API (former Native API)
 #include <alchemy/task.h>
 #include <alchemy/timer.h>
+#include <alchemy/queue.h>
 
 #define MS_2_NS(ms) (ms * 1000 * 1000) /* Convert ms to ns */
 
@@ -36,13 +37,11 @@ struct taskArgsStruct
 #define TASK_STKSZ 0 // Default stack size
 
 #define TASK_A_PRIO 26 // RT priority [0..99]
-#define TASK_A_PERIOD_NS MS_2_NS(1000)
+#define ACK_PERIOD_MS MS_2_NS(1000)
 
 #define TASK_B_PRIO 25 // RT priority [0..99]
-#define TASK_B_PERIOD_NS MS_2_NS(1000)
 
 #define TASK_C_PRIO 24 // RT priority [0..99]
-#define TASK_C_PERIOD_NS MS_2_NS(1000)
 
 RT_TASK sensor_task, processing_task, storage_task; // Task decriptor
 RT_QUEUE processing_q, storage_q;
@@ -51,8 +50,9 @@ RT_QUEUE processing_q, storage_q;
  * **********************/
 void catch_signal(int sig); /* Catches CTRL + C to allow a controlled termination of the application */
 void wait_for_ctrl_c(void);
-void Heavy_Work(void);      /* Load task */
-void task_code(void *args); /* Task body */
+void Heavy_Work(void);                 /* Load task */
+void processing_task_code(void *args); /* Task body */
+void sensor_task_code(void *args);     /* Task body */
 
 /* ******************
  * Main function
@@ -65,28 +65,35 @@ int main(int argc, char *argv[])
     /* Lock memory to prevent paging */
     mlockall(MCL_CURRENT | MCL_FUTURE);
 
+    taskAArgs.taskPeriod_ns = ACK_PERIOD_MS;
+    taskAArgs.taskName = "Sensor";
+    taskBArgs.taskPeriod_ns = 0;
+    taskBArgs.taskName = "Processing";
+    taskCArgs.taskPeriod_ns = 0;
+    taskCArgs.taskName = "Storage";
+
     /* Create RT task */
     /* Args: descriptor, name, stack size, priority [0..99] and mode (flags for CPU, FPU, joinable ...) */
-    err = rt_task_create(&sensor_task, "Task a", TASK_STKSZ, TASK_A_PRIO, TASK_MODE);
+    err = rt_task_create(&sensor_task, "Task Sensor", TASK_STKSZ, TASK_A_PRIO, TASK_MODE);
     if (err)
     {
-        printf("Error creating task a (error code = %d)\n", err);
+        printf("Error creating task Sensor (error code = %d)\n", err);
         return err;
     }
     else
         printf("Task %s created successfully\n", "a");
-    err = rt_task_create(&processing_task, "Task b", TASK_STKSZ, TASK_A_PRIO, TASK_MODE);
+    err = rt_task_create(&processing_task, "Task Processing", TASK_STKSZ, TASK_A_PRIO, TASK_MODE);
     if (err)
     {
-        printf("Error creating task b (error code = %d)\n", err);
+        printf("Error creating task Processing (error code = %d)\n", err);
         return err;
     }
     else
         printf("Task %s created successfully\n", "b");
-    err = rt_task_create(&storage_task, "Task c", TASK_STKSZ, TASK_A_PRIO, TASK_MODE);
+    err = rt_task_create(&storage_task, "Task Storage", TASK_STKSZ, TASK_A_PRIO, TASK_MODE);
     if (err)
     {
-        printf("Error creating task c (error code = %d)\n", err);
+        printf("Error creating task Storage (error code = %d)\n", err);
         return err;
     }
     else
@@ -94,21 +101,16 @@ int main(int argc, char *argv[])
 
     /* Start RT task */
     /* Args: task decriptor, address of function/implementation and argument*/
-    taskAArgs.taskPeriod_ns = TASK_A_PERIOD_NS;
-    taskAArgs.taskName = "TASK A";
-    taskBArgs.taskPeriod_ns = TASK_B_PERIOD_NS;
-    taskBArgs.taskName = "TASK B";
-    taskCArgs.taskPeriod_ns = TASK_C_PERIOD_NS;
-    taskCArgs.taskName = "TASK C";
+
     cpu_set_t cpus;
     CPU_ZERO(&cpus);
     CPU_SET(0, &cpus);
     rt_task_set_affinity(&sensor_task, &cpus);
     rt_task_set_affinity(&processing_task, &cpus);
     rt_task_set_affinity(&storage_task, &cpus);
-    rt_task_start(&sensor_task, &task_code, (void *)&taskAArgs);
-    rt_task_start(&processing_task, &task_code, (void *)&taskBArgs);
-    rt_task_start(&storage_task, &task_code, (void *)&taskCArgs);
+    rt_task_start(&sensor_task, &sensor_task_code, (void *)&taskAArgs);
+    rt_task_start(&processing_task, &processing_task_code, (void *)&taskBArgs);
+    rt_task_start(&storage_task, &sensor_task_code, (void *)&taskCArgs);
 
     /* wait for termination signal */
     wait_for_ctrl_c();
@@ -116,16 +118,36 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+void processing_task_code(void *args)
+{
+    FILE *sensor_data = fopen("sensorData.txt", "r");
+    if (sensor_data != NULL)
+    {
+        while (!feof(sensor_data))
+        {
+
+            char highByteChar = fgetc(sensor_data);
+            char lowByteChar = fgetc(sensor_data);
+            int highByte = highByteChar - 48;
+            int lowByte = lowByteChar - 48;
+            u_int16_t current_data = (highByte << 8) | lowByte;
+            char new_line = fgetc(sensor_data);
+            printf("data: %d\n", current_data);
+        }
+    }
+    fclose(sensor_data);
+}
+
 /* ***********************************
  * Task body implementation
  * *************************************/
-void task_code(void *args)
+void sensor_task_code(void *args)
 {
     RT_TASK *curtask;
     RT_TASK_INFO curtaskinfo;
     struct taskArgsStruct *taskArgs;
 
-    RTIME ta = 0, ta_prev = 0, t_min = TASK_A_PERIOD_NS, t_max = TASK_A_PERIOD_NS;
+    RTIME ta = 0, ta_prev = 0, t_min = ACK_PERIOD_MS, t_max = ACK_PERIOD_MS;
     unsigned long overruns;
     int err;
 
