@@ -145,22 +145,19 @@ void storage_task_code(void *args) {
 
 void processing_task_code(void *args)
 {
-    FILE *sensor_data = fopen("newSensorData.txt", "r");
-    if (sensor_data != NULL)
+    FILE *sensor_file = fopen("newSensorData.txt", "r");
+    if (sensor_file != NULL)
     {
-        while (!feof(sensor_data))
+        while (!feof(sensor_file))
         {
 
-            int highByte = fgetc(sensor_data);
-            int lowByte = fgetc(sensor_data);
-            printf("high: %d, low: %d\n", highByte, lowByte);
-
-            u_int16_t current_data = (highByte << 8) | lowByte;
-            char new_line = fgetc(sensor_data);
-            printf("data: %d\n", current_data);
+            u_int16_t sensor_data;
+            fread(&sensor_data, sizeof(sensor_data), 1, sensor_file);
+            char new_line = fgetc(sensor_file);
+            printf("data: %d\n", sensor_data);
         }
     }
-    fclose(sensor_data);
+    fclose(sensor_file);
 }
 
 /* ***********************************
