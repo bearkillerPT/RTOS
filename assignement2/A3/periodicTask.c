@@ -60,6 +60,18 @@ void storage_task_code(void *args);    /* Task body */
  * *******************/
 int main(int argc, char *argv[])
 {
+    int n, len;
+    void *msg;
+    len = strlen("olaa") + 1;
+    
+    rt_queue_create(&processing_q,"queue",50,Q_UNLIMITED,Q_FIFO);
+    rt_queue_create(&storage_q,"queue",50,Q_UNLIMITED,Q_FIFO);
+
+    
+
+    // printf("%p",msg);
+
+
     int err;
     struct taskArgsStruct taskAArgs, taskBArgs, taskCArgs;
     /* Lock memory to prevent paging */
@@ -244,9 +256,6 @@ void sensor_task_code(void *args)
 
         /* Task "load" */
         Heavy_Work();
-
-        
-
     }
 
     
