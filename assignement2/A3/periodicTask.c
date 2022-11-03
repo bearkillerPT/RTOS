@@ -128,21 +128,50 @@ void storage_task_code(void *args)
 
 void processing_task_code(void *args)
 {
-    FILE *sensor_file = fopen("sensorData.txt", "r");
-    if (sensor_file != NULL)
-    {
-        int i = 0;
-        while (!feof(sensor_file))
-        {
+    // FILE *sensor_file = fopen("sensorData.txt", "r");
+    // if (sensor_file != NULL)
+    // {
+    //     int i = 0;
+    //     while (!feof(sensor_file))
+    //     {
 
-            u_int16_t sensor_data;
-            fread(&sensor_data, sizeof(sensor_data), 1, sensor_file);
-            //char new_line = fgetc(sensor_file);
-            printf("data %d: %d\n", i, sensor_data);
-            i++;
+    //         u_int16_t sensor_data;
+    //         fread(&sensor_data, sizeof(sensor_data), 1, sensor_file);
+    //         //char new_line = fgetc(sensor_file);
+    //         printf("data %d: %d\n", i, sensor_data);
+    //         i++;
+    //     }
+    // }
+    // fclose(sensor_file);
+
+
+    ssize_t len;
+    void *msg;
+    int err;
+    /* Bind to a queue which has been created elsewhere, either in
+       kernel or user-space. The call will block us until such queue
+       is created with the expected name. The queue should have been
+       created with the Q_SHARED mode set, which is implicit when
+       creation takes place in user-space. */
+    err = rt_queue_bind(&processing_q,"SomeQueueName",TM_INFINITE);
+    if (err)
+        printf("fail");
+    /* Collect each message sent to the queue by the queuer() routine,
+       until the queue is eventually removed from the system by a call
+       to rt_queue_delete(). */
+    while ((len = rt_queue_receive(&processing_q,&msg,TM_INFINITE)) > 0)
+        {
+        printf("received message> len=%li bytes, ptr=%p, s=%s\n",
+               len,msg,(const char *)msg);
+        rt_queue_free(&processing_q,msg);
         }
-    }
-    fclose(sensor_file);
+    /* We need to unbind explicitly from the queue in order to
+       properly release the underlying memory mapping. Exiting the
+       process unbinds all mappings automatically. */
+    rt_queue_unbind(&processing_q);
+    if (len != -EIDRM)
+        /* We received some unexpected error notification. */
+        printf("fail");
 }
 
 /* ***********************************
@@ -188,13 +217,40 @@ void sensor_task_code(void *args)
                 t_min = ta - ta_prev;
             else if (ta - ta_prev > t_max)
                 t_max = ta - ta_prev;
-            printf("Task %s inter-arrival time (us): min: %10.3f / max: %10.3f \n\r", proc_task_name, (float)t_min / 1000, (float)t_max / 1000);
+            // printf("Task %s inter-arrival time (us): min: %10.3f / max: %10.3f \n\r", proc_task_name, (float)t_min / 1000, (float)t_max / 1000);
         }
         ta_prev = ta;
 
+        int n, len;
+        void *msg;
+
+        len = strlen("olaa") + 1;
+        
+        /* Get a message block of the right size. */
+        // int a =rt_queue_create(&processing_q,"processing Queue",50,Q_UNLIMITED,len);
+        msg = rt_queue_alloc(&processing_q,len);
+
+        if (!msg)
+            /* No memory available. */
+            printf("no memory available\n");
+
+        
+        // strcpy(msg,"olaa");
+        // rt_queue_send(&processing_q,msg,len,Q_NORMAL);
+        // printf("SENT");
+
         /* Task "load" */
         Heavy_Work();
+
+        
+
     }
+
+    
+    
+
+
+
     return;
 }
 
