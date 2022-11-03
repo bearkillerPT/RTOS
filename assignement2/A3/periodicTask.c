@@ -43,6 +43,8 @@ struct taskArgsStruct
 
 #define TASK_C_PRIO 24 // RT priority [0..99]
 
+int read_value = 0;
+
 RT_TASK sensor_task, processing_task, storage_task; // Task decriptor
 RT_QUEUE processing_q, storage_q;
 /* *********************
@@ -60,12 +62,10 @@ void storage_task_code(void *args);    /* Task body */
  * *******************/
 int main(int argc, char *argv[])
 {
-    int n, len;
-    void *msg;
-    len = strlen("olaa") + 1;
+
     
-    rt_queue_create(&processing_q,"queue",50,Q_UNLIMITED,Q_FIFO);
-    rt_queue_create(&storage_q,"queue",50,Q_UNLIMITED,Q_FIFO);
+    // rt_queue_create(&processing_q,"queue",50,Q_UNLIMITED,Q_FIFO);
+    // rt_queue_create(&storage_q,"queue",50,Q_UNLIMITED,Q_FIFO);
 
     
 
@@ -142,14 +142,13 @@ void storage_task_code(void *args)
 }
 
 void processing_task_code(void *args)
-{
+{   
     // FILE *sensor_file = fopen("sensorData.txt", "r");
     // if (sensor_file != NULL)
     // {
     //     int i = 0;
     //     while (!feof(sensor_file))
     //     {
-
     //         u_int16_t sensor_data;
     //         fread(&sensor_data, sizeof(sensor_data), 1, sensor_file);
     //         //char new_line = fgetc(sensor_file);
@@ -176,8 +175,8 @@ void processing_task_code(void *args)
 
     while ((len = rt_queue_receive(&processing_q,&msg,TM_INFINITE)) > 0)
         {
-        printf("received message> len=%li bytes, ptr=%p, s=%s\n",
-               len,msg,(const char *)msg);
+        printf("received message> len=%li bytes, ptr=%p, s=%d\n",
+               len,msg,*((uint16_t*)msg));
         rt_queue_free(&processing_q,msg);
         }
     /* We need to unbind explicitly from the queue in order to
@@ -195,6 +194,7 @@ void processing_task_code(void *args)
  * *************************************/
 void sensor_task_code(void *args)
 {
+    
     RT_TASK *curtask;
     RT_TASK_INFO curtaskinfo;
     struct taskArgsStruct *taskArgs;
@@ -236,10 +236,28 @@ void sensor_task_code(void *args)
         }
         ta_prev = ta;
 
+        u_int16_t sensor_data;
+        FILE *sensor_file = fopen("sensorData.txt", "r");
+        if (sensor_file != NULL)
+        {  
+            if (!feof(sensor_file))
+            {
+                int i =0;
+                while(i++ < read_value)
+                    fread(&sensor_data, sizeof(sensor_data), 1, sensor_file);
+                
+                fread(&sensor_data, sizeof(sensor_data), 1, sensor_file);
+                //char new_line = fgetc(sensor_file);
+                printf("data %d: %d\n", read_value, sensor_data);
+                read_value++;
+            }
+        }
+        fclose(sensor_file);
+
         int n, len;
         void *msg;
 
-        len = strlen("olaa") + 1;
+        len = sizeof(uint16_t);
         
         /* Get a message block of the right size. */
         // int a =rt_queue_create(&processing_q,"processing Queue",50,Q_UNLIMITED,len);
@@ -250,9 +268,9 @@ void sensor_task_code(void *args)
             printf("no memory available\n");
 
 
-         strcpy(msg,"olaa");
-         rt_queue_send(&processing_q,msg,len,Q_NORMAL);
-         printf("SENT\n");
+        memcpy(msg, &sensor_data, len);
+        int a = rt_queue_send(&processing_q,msg,len,Q_NORMAL);
+        printf("SENT\n");
 
         /* Task "load" */
         Heavy_Work();
