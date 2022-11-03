@@ -62,7 +62,6 @@ int main(int argc, char *argv[])
 {
     int err;
     struct taskArgsStruct taskAArgs, taskBArgs, taskCArgs;
-
     /* Lock memory to prevent paging */
     mlockall(MCL_CURRENT | MCL_FUTURE);
 
@@ -73,6 +72,10 @@ int main(int argc, char *argv[])
     taskCArgs.taskPeriod_ns = 0;
     taskCArgs.taskName = "Storage";
 
+
+
+    err = rt_queue_create(&processing_q, "processing_q", 10000, Q_UNLIMITED, Q_FIFO);
+    printf("create: %d\n", err);
     /* Create RT task */
     /* Args: descriptor, name, stack size, priority [0..99] and mode (flags for CPU, FPU, joinable ...) */
     err = rt_task_create(&sensor_task, "Task Sensor", TASK_STKSZ, TASK_A_PRIO, TASK_MODE);
@@ -144,7 +147,6 @@ void processing_task_code(void *args)
     // }
     // fclose(sensor_file);
 
-
     ssize_t len;
     void *msg;
     int err;
@@ -153,12 +155,13 @@ void processing_task_code(void *args)
        is created with the expected name. The queue should have been
        created with the Q_SHARED mode set, which is implicit when
        creation takes place in user-space. */
-    err = rt_queue_bind(&processing_q,"SomeQueueName",TM_INFINITE);
+    err = rt_queue_bind(&processing_q,"processing_q",TM_INFINITE);
     if (err)
         printf("fail");
     /* Collect each message sent to the queue by the queuer() routine,
        until the queue is eventually removed from the system by a call
        to rt_queue_delete(). */
+
     while ((len = rt_queue_receive(&processing_q,&msg,TM_INFINITE)) > 0)
         {
         printf("received message> len=%li bytes, ptr=%p, s=%s\n",
@@ -169,6 +172,7 @@ void processing_task_code(void *args)
        properly release the underlying memory mapping. Exiting the
        process unbinds all mappings automatically. */
     rt_queue_unbind(&processing_q);
+
     if (len != -EIDRM)
         /* We received some unexpected error notification. */
         printf("fail");
@@ -186,7 +190,6 @@ void sensor_task_code(void *args)
     RTIME ta = 0, ta_prev = 0, t_min = ACK_PERIOD_MS, t_max = ACK_PERIOD_MS;
     unsigned long overruns;
     int err;
-
     /* Get task information */
     curtask = rt_task_self();
     rt_task_inquire(curtask, &curtaskinfo);
@@ -234,10 +237,10 @@ void sensor_task_code(void *args)
             /* No memory available. */
             printf("no memory available\n");
 
-        
-        // strcpy(msg,"olaa");
-        // rt_queue_send(&processing_q,msg,len,Q_NORMAL);
-        // printf("SENT");
+
+         strcpy(msg,"olaa");
+         rt_queue_send(&processing_q,msg,len,Q_NORMAL);
+         printf("SENT\n");
 
         /* Task "load" */
         Heavy_Work();
