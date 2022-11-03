@@ -60,6 +60,18 @@ void storage_task_code(void *args);    /* Task body */
  * *******************/
 int main(int argc, char *argv[])
 {
+    int n, len;
+    void *msg;
+    len = strlen("olaa") + 1;
+    
+    rt_queue_create(&processing_q,"queue",50,Q_UNLIMITED,Q_FIFO);
+    rt_queue_create(&storage_q,"queue",50,Q_UNLIMITED,Q_FIFO);
+
+    
+
+    // printf("%p",msg);
+
+
     int err;
     struct taskArgsStruct taskAArgs, taskBArgs, taskCArgs;
 
@@ -154,6 +166,7 @@ void processing_task_code(void *args)
        created with the Q_SHARED mode set, which is implicit when
        creation takes place in user-space. */
     err = rt_queue_bind(&processing_q,"SomeQueueName",TM_INFINITE);
+    printf("%d\n",err);
     if (err)
         printf("fail");
     /* Collect each message sent to the queue by the queuer() routine,
@@ -221,29 +234,14 @@ void sensor_task_code(void *args)
         }
         ta_prev = ta;
 
-        int n, len;
-        void *msg;
-
-        len = strlen("olaa") + 1;
-        
-        /* Get a message block of the right size. */
-        // int a =rt_queue_create(&processing_q,"processing Queue",50,Q_UNLIMITED,len);
-        msg = rt_queue_alloc(&processing_q,len);
-
-        if (!msg)
-            /* No memory available. */
-            printf("no memory available\n");
-
-        
-        // strcpy(msg,"olaa");
-        // rt_queue_send(&processing_q,msg,len,Q_NORMAL);
-        // printf("SENT");
+        char *msg;
+        int len;
+        len = strlen("ola") + 1;
+        strcpy(msg,"ola");
+        rt_queue_send(&processing_q,msg,len,Q_NORMAL);
 
         /* Task "load" */
         Heavy_Work();
-
-        
-
     }
 
     
