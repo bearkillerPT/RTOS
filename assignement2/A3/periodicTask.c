@@ -92,11 +92,11 @@ int main(int argc, char *argv[])
     err = rt_queue_create(&storage_q, "storage_q", 10000, Q_UNLIMITED, Q_FIFO);
     if (err)
     {
-        printf("Error creating Processing queue! (error code = %d)\n", err);
+        printf("Error creating Storage queue! (error code = %d)\n", err);
         return err;
     }
     else
-        printf("Processing queue created successfully\n");
+        printf("Storage queue created successfully\n");
 
     /* Create RT tasks */
     /* Args: descriptor, name, stack size, priority [0..99] and mode (flags for CPU, FPU, joinable ...) */
