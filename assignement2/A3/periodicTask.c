@@ -63,14 +63,10 @@ void storage_task_code(void *args);    /* Task body */
 int main(int argc, char *argv[])
 {
 
-    
     // rt_queue_create(&processing_q,"queue",50,Q_UNLIMITED,Q_FIFO);
     // rt_queue_create(&storage_q,"queue",50,Q_UNLIMITED,Q_FIFO);
 
-    
-
     // printf("%p",msg);
-
 
     int err;
     struct taskArgsStruct taskAArgs, taskBArgs, taskCArgs;
@@ -84,36 +80,35 @@ int main(int argc, char *argv[])
     taskCArgs.taskPeriod_ns = 0;
     taskCArgs.taskName = "Storage";
 
-
-
+    /* Create RT Queues */
     err = rt_queue_create(&processing_q, "processing_q", 10000, Q_UNLIMITED, Q_FIFO);
-    printf("create: %d\n", err);
-    /* Create RT task */
+
+    /* Create RT tasks */
     /* Args: descriptor, name, stack size, priority [0..99] and mode (flags for CPU, FPU, joinable ...) */
     err = rt_task_create(&sensor_task, "Task Sensor", TASK_STKSZ, TASK_A_PRIO, TASK_MODE);
     if (err)
     {
-        printf("Error creating task Sensor (error code = %d)\n", err);
+        printf("Error creating %s task! (error code = %d)\n", taskAArgs.taskName, err);
         return err;
     }
     else
-        printf("Task %s created successfully\n", "a");
+        printf("Task %s created successfully\n", taskAArgs.taskName);
     err = rt_task_create(&processing_task, "Task Processing", TASK_STKSZ, TASK_A_PRIO, TASK_MODE);
     if (err)
     {
-        printf("Error creating task Processing (error code = %d)\n", err);
+        printf("Error creating %s task! (error code = %d)\n", taskBArgs.taskName, err);
         return err;
     }
     else
-        printf("Task %s created successfully\n", "b");
+        printf("Task %s created successfully\n", taskBArgs.taskName);
     err = rt_task_create(&storage_task, "Task Storage", TASK_STKSZ, TASK_A_PRIO, TASK_MODE);
     if (err)
     {
-        printf("Error creating task Storage (error code = %d)\n", err);
+        printf("Error creating %s task! (error code = %d)\n", taskCArgs.taskName, err);
         return err;
     }
     else
-        printf("Task %s created successfully\n", "c");
+        printf("Task %s created successfully\n", taskCArgs.taskName);
 
     /* Start RT task */
     /* Args: task decriptor, address of function/implementation and argument*/
@@ -142,7 +137,7 @@ void storage_task_code(void *args)
 }
 
 void processing_task_code(void *args)
-{   
+{
     // FILE *sensor_file = fopen("sensorData.txt", "r");
     // if (sensor_file != NULL)
     // {
@@ -166,19 +161,19 @@ void processing_task_code(void *args)
        is created with the expected name. The queue should have been
        created with the Q_SHARED mode set, which is implicit when
        creation takes place in user-space. */
-    err = rt_queue_bind(&processing_q,"processing_q",TM_INFINITE);
+    err = rt_queue_bind(&processing_q, "processing_q", TM_INFINITE);
     if (err)
         printf("fail");
     /* Collect each message sent to the queue by the queuer() routine,
        until the queue is eventually removed from the system by a call
        to rt_queue_delete(). */
 
-    while ((len = rt_queue_receive(&processing_q,&msg,TM_INFINITE)) > 0)
-        {
+    while ((len = rt_queue_receive(&processing_q, &msg, TM_INFINITE)) > 0)
+    {
         printf("received message> len=%li bytes, ptr=%p, s=%d\n",
-               len,msg,*((uint16_t*)msg));
-        rt_queue_free(&processing_q,msg);
-        }
+               len, msg, *((uint16_t *)msg));
+        rt_queue_free(&processing_q, msg);
+    }
     /* We need to unbind explicitly from the queue in order to
        properly release the underlying memory mapping. Exiting the
        process unbinds all mappings automatically. */
@@ -194,7 +189,9 @@ void processing_task_code(void *args)
  * *************************************/
 void sensor_task_code(void *args)
 {
-    
+    // Sensor file
+    FILE *sensor_file = fopen("sensorData.txt", "r");
+
     RT_TASK *curtask;
     RT_TASK_INFO curtaskinfo;
     struct taskArgsStruct *taskArgs;
@@ -237,50 +234,33 @@ void sensor_task_code(void *args)
         ta_prev = ta;
 
         u_int16_t sensor_data;
-        FILE *sensor_file = fopen("sensorData.txt", "r");
-        if (sensor_file != NULL)
-        {  
-            if (!feof(sensor_file))
-            {
-                int i =0;
-                while(i++ < read_value)
-                    fread(&sensor_data, sizeof(sensor_data), 1, sensor_file);
-                
-                fread(&sensor_data, sizeof(sensor_data), 1, sensor_file);
-                //char new_line = fgetc(sensor_file);
-                printf("data %d: %d\n", read_value, sensor_data);
-                read_value++;
-            }
-        }
-        fclose(sensor_file);
+        if (sensor_file != NULL && !feof(sensor_file))
+            fread(&sensor_data, sizeof(sensor_data), 1, sensor_file);
+        else
+            break;
 
         int n, len;
         void *msg;
 
         len = sizeof(uint16_t);
-        
+
         /* Get a message block of the right size. */
-        // int a =rt_queue_create(&processing_q,"processing Queue",50,Q_UNLIMITED,len);
-        msg = rt_queue_alloc(&processing_q,len);
+        msg = rt_queue_alloc(&processing_q, len);
 
         if (!msg)
             /* No memory available. */
-            printf("no memory available\n");
-
+            printf("No memory available!\n");
 
         memcpy(msg, &sensor_data, len);
-        int a = rt_queue_send(&processing_q,msg,len,Q_NORMAL);
+        int a = rt_queue_send(&processing_q, msg, len, Q_NORMAL);
         printf("SENT\n");
 
         /* Task "load" */
         Heavy_Work();
     }
 
-    
-    
-
-
-
+    printf("Sensor task finished!\n");
+    fclose(sensor_file);
     return;
 }
 
