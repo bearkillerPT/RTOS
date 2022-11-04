@@ -158,6 +158,7 @@ void storage_task_code(void *args)
     err = rt_queue_bind(&storage_q, "storage_q", TM_INFINITE);
     while ((len = rt_queue_receive(&storage_q, &msg, TM_INFINITE)) > 0) {
         fwrite(msg, sizeof(u_int16_t), 1, sensor_data);
+        fflush(sensor_data);
         rt_queue_free(&storage_q, msg);
     }
     rt_queue_unbind(&storage_q);
