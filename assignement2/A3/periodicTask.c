@@ -56,13 +56,12 @@ void Heavy_Work(void);                 /* Load task */
 void processing_task_code(void *args); /* Task body */
 void sensor_task_code(void *args);     /* Task body */
 void storage_task_code(void *args);    /* Task body */
-
+u_int16_t precedentsAverage(u_int16_t* precedents, u_int16_t current_read);
 /* ******************
  * Main function
  * *******************/
 int main(int argc, char *argv[])
 {
-
     // rt_queue_create(&processing_q,"queue",50,Q_UNLIMITED,Q_FIFO);
     // rt_queue_create(&storage_q,"queue",50,Q_UNLIMITED,Q_FIFO);
 
@@ -82,6 +81,22 @@ int main(int argc, char *argv[])
 
     /* Create RT Queues */
     err = rt_queue_create(&processing_q, "processing_q", 10000, Q_UNLIMITED, Q_FIFO);
+    if (err)
+    {
+        printf("Error creating Processing queue! (error code = %d)\n", err);
+        return err;
+    }
+    else
+        printf("Processing queue created successfully\n");
+
+    err = rt_queue_create(&storage_q, "storage_q", 10000, Q_UNLIMITED, Q_FIFO);
+    if (err)
+    {
+        printf("Error creating Processing queue! (error code = %d)\n", err);
+        return err;
+    }
+    else
+        printf("Processing queue created successfully\n");
 
     /* Create RT tasks */
     /* Args: descriptor, name, stack size, priority [0..99] and mode (flags for CPU, FPU, joinable ...) */
@@ -132,27 +147,25 @@ int main(int argc, char *argv[])
 void storage_task_code(void *args)
 {
     FILE *sensor_data = fopen("newSensorData.txt", "w");
-
+    ssize_t len;
+    void *msg;
+    int err;
+    /* Bind to a queue which has been created elsewhere, either in
+       kernel or user-space. The call will block us until such queue
+       is created with the expected name. The queue should have been
+       created with the Q_SHARED mode set, which is implicit when
+       creation takes place in user-space. */
+    err = rt_queue_bind(&storage_q, "storage_q", TM_INFINITE);
+    while ((len = rt_queue_receive(&storage_q, &msg, TM_INFINITE)) > 0) {
+        fwrite(msg, sizeof(u_int16_t), 1, sensor_data);
+        rt_queue_free(&storage_q, msg);
+    }
+    rt_queue_unbind(&storage_q);
     fclose(sensor_data);
 }
 
 void processing_task_code(void *args)
 {
-    // FILE *sensor_file = fopen("sensorData.txt", "r");
-    // if (sensor_file != NULL)
-    // {
-    //     int i = 0;
-    //     while (!feof(sensor_file))
-    //     {
-    //         u_int16_t sensor_data;
-    //         fread(&sensor_data, sizeof(sensor_data), 1, sensor_file);
-    //         //char new_line = fgetc(sensor_file);
-    //         printf("data %d: %d\n", i, sensor_data);
-    //         i++;
-    //     }
-    // }
-    // fclose(sensor_file);
-
     ssize_t len;
     void *msg;
     int err;
@@ -167,12 +180,34 @@ void processing_task_code(void *args)
     /* Collect each message sent to the queue by the queuer() routine,
        until the queue is eventually removed from the system by a call
        to rt_queue_delete(). */
-
+    u_int16_t precedents[4] = {0, 0, 0, 0};
+    int message_counter = 0;
+    u_int16_t current_read = 0;
     while ((len = rt_queue_receive(&processing_q, &msg, TM_INFINITE)) > 0)
     {
-        printf("received message> len=%li bytes, ptr=%p, s=%d\n",
-               len, msg, *((uint16_t *)msg));
+        current_read = *((uint16_t *)msg);
+        if (message_counter > 3)
+        {
+            // calculate the average with the new elem and the precedents
+            u_int16_t avg = precedentsAverage(precedents, current_read);
+            void *msg;
+            printf("avg([%d,%d,%d,%d,%d]) = %d\n", precedents[0], precedents[1], precedents[2], precedents[3], current_read, avg);
+            /* Get a message block of the right size. */
+            msg = rt_queue_alloc(&storage_q, sizeof(uint16_t));
+
+            if (!msg)
+                /* No memory available. */
+                printf("No memory available!\n");
+
+            memcpy(msg, &current_read, sizeof(uint16_t));
+            int a = rt_queue_send(&storage_q, msg, sizeof(uint16_t), Q_NORMAL);
+            precedents[message_counter % 4] = current_read;
+        }
+        else
+            precedents[message_counter] = current_read;
+        // printf("received message> len=%li bytes, ptr=%p, s=%d\n", len, msg, *((uint16_t *)msg));
         rt_queue_free(&processing_q, msg);
+        message_counter++;
     }
     /* We need to unbind explicitly from the queue in order to
        properly release the underlying memory mapping. Exiting the
@@ -239,21 +274,17 @@ void sensor_task_code(void *args)
         else
             break;
 
-        int n, len;
         void *msg;
 
-        len = sizeof(uint16_t);
-
         /* Get a message block of the right size. */
-        msg = rt_queue_alloc(&processing_q, len);
+        msg = rt_queue_alloc(&processing_q, sizeof(uint16_t));
 
         if (!msg)
             /* No memory available. */
             printf("No memory available!\n");
 
-        memcpy(msg, &sensor_data, len);
-        int a = rt_queue_send(&processing_q, msg, len, Q_NORMAL);
-        printf("SENT\n");
+        memcpy(msg, &sensor_data, sizeof(uint16_t));
+        int a = rt_queue_send(&processing_q, msg, sizeof(uint16_t), Q_NORMAL);
 
         /* Task "load" */
         Heavy_Work();
@@ -295,7 +326,7 @@ void Heavy_Work(void)
 
     RTIME ts, // Function start time
         tf;   // Function finish time
-
+    
     static int first = 0; // Flag to signal first execution
 
     /* Get start time */
@@ -330,4 +361,8 @@ void Heavy_Work(void)
 
         first = 1;
     }
+}
+
+u_int16_t precedentsAverage(u_int16_t* precedents, u_int16_t current_read) {
+    return (precedents[0] + precedents[1] + precedents[2] + precedents[3] + current_read) / 5;  
 }
