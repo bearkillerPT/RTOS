@@ -275,7 +275,7 @@ void sensor_task_code(void *args)
                 t_min = ta - ta_prev;
             else if (ta - ta_prev > t_max)
                 t_max = ta - ta_prev;
-            printf("Task %s arrived at %llu inter-arrival time (us): min: %10.3f / max: %10.3f \n\r", proc_task_name,rt_timer_read(),x (float)t_min / 1000, (float)t_max / 1000);
+            printf("Task %s arrived at %llu inter-arrival time (us): min: %10.3f / max: %10.3f \n\r", proc_task_name,rt_timer_read(),(float)t_min / 1000, (float)t_max / 1000);
         }
         ta_prev = ta;
 
