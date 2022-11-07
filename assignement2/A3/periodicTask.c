@@ -56,7 +56,7 @@ void Heavy_Work(void);                 /* Load task */
 void processing_task_code(void *args); /* Task body */
 void sensor_task_code(void *args);     /* Task body */
 void storage_task_code(void *args);    /* Task body */
-u_int16_t precedentsAverage(u_int16_t* precedents, u_int16_t current_read);
+u_int16_t precedentsAverage(u_int16_t *precedents, u_int16_t current_read);
 /* ******************
  * Main function
  * *******************/
@@ -146,6 +146,7 @@ int main(int argc, char *argv[])
 
 void storage_task_code(void *args)
 {
+    printf("Storage activation: %lld\n", rt_timer_read());
     FILE *sensor_data = fopen("newSensorData.txt", "w");
     ssize_t len;
     void *msg;
@@ -156,7 +157,9 @@ void storage_task_code(void *args)
        created with the Q_SHARED mode set, which is implicit when
        creation takes place in user-space. */
     err = rt_queue_bind(&storage_q, "storage_q", TM_INFINITE);
-    while ((len = rt_queue_receive(&storage_q, &msg, TM_INFINITE)) > 0) {
+    while ((len = rt_queue_receive(&storage_q, &msg, TM_INFINITE)) > 0)
+    {
+        printf("Storage receive: %lld\n", rt_timer_read());
         fwrite(msg, sizeof(u_int16_t), 1, sensor_data);
         fflush(sensor_data);
         rt_queue_free(&storage_q, msg);
@@ -167,6 +170,8 @@ void storage_task_code(void *args)
 
 void processing_task_code(void *args)
 {
+    printf("Processing task activation: %lld\n", rt_timer_read());
+
     ssize_t len;
     void *msg;
     int err;
@@ -186,13 +191,16 @@ void processing_task_code(void *args)
     u_int16_t current_read = 0;
     while ((len = rt_queue_receive(&processing_q, &msg, TM_INFINITE)) > 0)
     {
+        printf("Processing receive: %lld\n", rt_timer_read());
         current_read = *((uint16_t *)msg);
         if (message_counter > 3)
         {
+
             // calculate the average with the new elem and the precedents
             u_int16_t avg = precedentsAverage(precedents, current_read);
-            void *msg;
             printf("avg([%d,%d,%d,%d,%d]) = %d\n", precedents[0], precedents[1], precedents[2], precedents[3], current_read, avg);
+            void *msg;
+            // printf("avg([%d,%d,%d,%d,%d]) = %d\n", precedents[0], precedents[1], precedents[2], precedents[3], current_read, avg);
             /* Get a message block of the right size. */
             msg = rt_queue_alloc(&storage_q, sizeof(uint16_t));
 
@@ -202,6 +210,8 @@ void processing_task_code(void *args)
 
             memcpy(msg, &current_read, sizeof(uint16_t));
             int a = rt_queue_send(&storage_q, msg, sizeof(uint16_t), Q_NORMAL);
+            printf("Processing send: %lld\n", rt_timer_read());
+
             precedents[message_counter % 4] = current_read;
         }
         else
@@ -257,7 +267,7 @@ void sensor_task_code(void *args)
         }
         if (ta_prev == 0)
         {
-            printf("Task %s activation at time %llu\n", proc_task_name, ta);
+            printf("Sensor Task activation: %llu\n", ta);
         }
         else
         {
@@ -265,7 +275,7 @@ void sensor_task_code(void *args)
                 t_min = ta - ta_prev;
             else if (ta - ta_prev > t_max)
                 t_max = ta - ta_prev;
-            // printf("Task %s inter-arrival time (us): min: %10.3f / max: %10.3f \n\r", proc_task_name, (float)t_min / 1000, (float)t_max / 1000);
+            printf("Task %s arrived at %llu inter-arrival time (us): min: %10.3f / max: %10.3f \n\r", proc_task_name,rt_timer_read(),x (float)t_min / 1000, (float)t_max / 1000);
         }
         ta_prev = ta;
 
@@ -286,6 +296,7 @@ void sensor_task_code(void *args)
 
         memcpy(msg, &sensor_data, sizeof(uint16_t));
         int a = rt_queue_send(&processing_q, msg, sizeof(uint16_t), Q_NORMAL);
+        printf("Sensor send: %lld\n", rt_timer_read());
 
         /* Task "load" */
         Heavy_Work();
@@ -327,7 +338,7 @@ void Heavy_Work(void)
 
     RTIME ts, // Function start time
         tf;   // Function finish time
-    
+
     static int first = 0; // Flag to signal first execution
 
     /* Get start time */
@@ -364,6 +375,7 @@ void Heavy_Work(void)
     }
 }
 
-u_int16_t precedentsAverage(u_int16_t* precedents, u_int16_t current_read) {
-    return (precedents[0] + precedents[1] + precedents[2] + precedents[3] + current_read) / 5;  
+u_int16_t precedentsAverage(u_int16_t *precedents, u_int16_t current_read)
+{
+    return (precedents[0] + precedents[1] + precedents[2] + precedents[3] + current_read) / 5;
 }

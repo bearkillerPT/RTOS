@@ -35,13 +35,13 @@ struct taskArgsStruct
 #define TASK_MODE 0  // No flags
 #define TASK_STKSZ 0 // Default stack size
 
-#define TASK_A_PRIO 26 // RT priority [0..99]
+#define TASK_A_PRIO 0 // RT priority [0..99]
 #define TASK_A_PERIOD_NS MS_2_NS(1000)
 
-#define TASK_B_PRIO 25 // RT priority [0..99]
+#define TASK_B_PRIO 50 // RT priority [0..99]
 #define TASK_B_PERIOD_NS MS_2_NS(1000)
 
-#define TASK_C_PRIO 24 // RT priority [0..99]
+#define TASK_C_PRIO 99 // RT priority [0..99]
 #define TASK_C_PERIOD_NS MS_2_NS(1000)
 
 RT_TASK task_a_desc, task_b_desc, task_c_desc; // Task decriptor
