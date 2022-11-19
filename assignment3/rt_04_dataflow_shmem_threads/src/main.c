@@ -98,9 +98,8 @@ struct k_sem sem_bc;
 void thread_sensor_code(void *argA, void *argB, void *argC);
 void thread_processing_code(void *argA, void *argB, void *argC);
 void thread_output_code(void *argA, void *argB, void *argC);
-uint16_t precedentsAverage(uint16_t *precedents, uint16_t current_read, uint16_t precedents_size);
-void turnLedOn(int *ledState, const struct gpio_dt_spec *led);
-void turnLedOff(int *ledState, const struct gpio_dt_spec *led);
+int precedentsAverage(uint16_t *precedents, uint16_t current_read, uint16_t precedents_size);
+
 
 /* Takes one sample */
 static int adc_sample(void)
@@ -133,6 +132,29 @@ static int adc_sample(void)
 void main(void)
 {
     int err = 0;
+    int ret;
+    /* Configure the GPIO pin for output */
+    ret = gpio_pin_configure_dt(&led0, GPIO_OUTPUT_INACTIVE);
+    if (ret < 0)
+    {
+        return;
+    }
+    ret = gpio_pin_configure_dt(&led1, GPIO_OUTPUT_INACTIVE);
+    if (ret < 0)
+    {
+        return;
+    }
+    ret = gpio_pin_configure_dt(&led2, GPIO_OUTPUT_INACTIVE);
+    if (ret < 0)
+    {
+        return;
+    }
+    ret = gpio_pin_configure_dt(&led3, GPIO_OUTPUT_INACTIVE);
+    if (ret < 0)
+    {
+        return;
+    }
+
 
     adc_dev = device_get_binding(DT_LABEL(ADC_NODE));
     if (!adc_dev)
@@ -209,7 +231,7 @@ void thread_sensor_code(void *argA, void *argB, void *argC)
                 /* ADC is set to use gain of 1/4 and reference VDD/4, so input range is 0...VDD (3 V), with 10 bit resolution */
                 printk("adc reading: raw:%4u / %4u mV: \n\r", adc_sample_buffer[0], (uint16_t)(1000 * adc_sample_buffer[0] * ((float)3 / 1023)));
                 ab = (uint16_t)(1000 * adc_sample_buffer[0] * ((float)3 / 1023));
-                ab = 1500;
+                ab = 8000;
                 printk("Thread A set ab value to: %d \n", ab);
             }
         }
@@ -266,14 +288,12 @@ void thread_output_code(void *argA, void *argB, void *argC)
     int ret;
 
     printk("Thread C init (sporadic, waits on a semaphore by task A)\n");
-    int led_states[4] = {1, 1, 1, 1};
 
-    // turnLedOn(&led_states[0], &led0);
-    // turnLedOn(&led_states[1], &led1);
-    // turnLedOn(&led_states[2], &led2);
-    // turnLedOff(&led_states[3], &led3);
-
-    
+    /* Check if device is ready */
+    if (!device_is_ready(led0.port) || !device_is_ready(led1.port) || !device_is_ready(led2.port) || !device_is_ready(led3.port))
+    {
+        return;
+    }
 
     while (1)
     {
@@ -281,67 +301,67 @@ void thread_output_code(void *argA, void *argB, void *argC)
         printk("Thread C instance %5ld released at time: %lld (ms). \n", ++nact, k_uptime_get());
         printk("Task C read bc value: %d\n", bc);
 
-        
-
-        /* Check if device is ready */
-        if (!device_is_ready(led0.port) || !device_is_ready(led1.port) || !device_is_ready(led2.port) || !device_is_ready(led3.port))
-        {
-            return;
-        }
-
-        /* Configure the GPIO pin for output */
-        ret = gpio_pin_configure_dt(&led0, GPIO_OUTPUT_ACTIVE);
-        if (ret < 0)
-        {
-            return;
-        }
-        ret = gpio_pin_configure_dt(&led1, GPIO_OUTPUT_ACTIVE);
-        if (ret < 0)
-        {
-            return;
-        }
-        ret = gpio_pin_configure_dt(&led2, GPIO_OUTPUT_ACTIVE);
-        if (ret < 0)
-        {
-            return;
-        }
-        ret = gpio_pin_configure_dt(&led3, GPIO_OUTPUT_ACTIVE);
-        if (ret < 0)
-        {
-            return;
-        }
         printk("\t%d\n",bc);
         if (bc < 1000)
         {
-            turnLedOn(&led_states[0], &led0);
-            turnLedOn(&led_states[1], &led1);
-            turnLedOn(&led_states[2], &led2);
-            turnLedOn(&led_states[3], &led3);
+            ret = gpio_pin_set_dt(&led0, 1);
+            if (ret < 0)
+                printk("SETTING LED VALUE FAILED");
+            ret = gpio_pin_set_dt(&led1, 1);
+            if (ret < 0)
+                printk("SETTING LED VALUE FAILED");
+            ret = gpio_pin_set_dt(&led2, 1);
+            if (ret < 0)
+                printk("SETTING LED VALUE FAILED");
+            ret = gpio_pin_set_dt(&led3, 1);
+            if (ret < 0)
+                printk("SETTING LED VALUE FAILED");
+            
         }
         else if (bc < 2000)
         {
-            printk("states=%d, %d, %d, %d\n",led_states[0],led_states[1],led_states[2],led_states[3]);
-            // turnLedOn(&led_states[0], &led0);
-            // turnLedOn(&led_states[1], &led1);
-            // turnLedOn(&led_states[2], &led2);
-            // turnLedOff(&led_states[3], &led3);
-            ret = gpio_pin_set_dt(&led0, 0);
+            ret = gpio_pin_set_dt(&led0, 1);
+            if (ret < 0)
+                printk("SETTING LED VALUE FAILED");
+            ret = gpio_pin_set_dt(&led1, 1);
+            if (ret < 0)
+                printk("SETTING LED VALUE FAILED");
+            ret = gpio_pin_set_dt(&led2, 1);
+            if (ret < 0)
+                printk("SETTING LED VALUE FAILED");
+            ret = gpio_pin_set_dt(&led3, 0);
             if (ret < 0)
                 printk("SETTING LED VALUE FAILED");
         }
         else if (bc < 3000)
         {
-            turnLedOn(&led_states[0], &led0);
-            turnLedOn(&led_states[1], &led1);
-            turnLedOff(&led_states[2], &led2);
-            turnLedOff(&led_states[3], &led3);
+            ret = gpio_pin_set_dt(&led0, 1);
+            if (ret < 0)
+                printk("SETTING LED VALUE FAILED");
+            ret = gpio_pin_set_dt(&led1, 1);
+            if (ret < 0)
+                printk("SETTING LED VALUE FAILED");
+            ret = gpio_pin_set_dt(&led2, 0);
+            if (ret < 0)
+                printk("SETTING LED VALUE FAILED");
+            ret = gpio_pin_set_dt(&led3, 0);
+            if (ret < 0)
+                printk("SETTING LED VALUE FAILED");
         }
         else
         {
-            turnLedOn(&led_states[0], &led0);
-            turnLedOff(&led_states[1], &led1);
-            turnLedOff(&led_states[2], &led2);
-            turnLedOff(&led_states[3], &led3);
+            ret = gpio_pin_set_dt(&led0, 1);
+            if (ret < 0)
+                printk("SETTING LED VALUE FAILED");
+            ret = gpio_pin_set_dt(&led1, 0);
+            if (ret < 0)
+                printk("SETTING LED VALUE FAILED");
+            ret = gpio_pin_set_dt(&led2, 0);
+            if (ret < 0)
+                printk("SETTING LED VALUE FAILED");
+            ret = gpio_pin_set_dt(&led3, 0);
+            if (ret < 0)
+                printk("SETTING LED VALUE FAILED");
         }
 
        
@@ -349,35 +369,11 @@ void thread_output_code(void *argA, void *argB, void *argC)
     }
 }
 
-uint16_t precedentsAverage(uint16_t *precedents, uint16_t current_read, uint16_t precedents_size)
+int precedentsAverage(uint16_t *precedents, uint16_t current_read, uint16_t precedents_size)
 {
-    uint16_t sum = 0;
+    int sum = 0;
     for (uint16_t i = 0; i < precedents_size; i++)
         sum += precedents[i];
     return (sum + current_read) / (precedents_size+1);
 }
 
-void turnLedOn(int *ledState, const struct gpio_dt_spec *led)
-{
-    int ret;
-    if (*ledState == 0)
-    {
-        ret = gpio_pin_toggle_dt(led);
-        if (ret < 0)
-            printk("TOGGLING LED FAILED");
-        *ledState = 1;
-    }
-}
-
-void turnLedOff(int *ledState, const struct gpio_dt_spec *led)
-{
-    int ret;
-    if (*ledState == 1)
-    {
-        
-        ret = gpio_pin_toggle_dt(led);
-        if (ret < 0)
-            printk("TOGGLING LED FAILED");
-        *ledState = 0;
-    }
-}
