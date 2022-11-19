@@ -60,11 +60,13 @@ static uint16_t adc_sample_buffer[BUFFER_SIZE];
 
 /* Therad periodicity (in ms)*/
 #define SAMP_PERIOD_MS 1000
+#define SLEEP_TIME_MS 500
 
 #define LED0_NODE DT_NODELABEL(led0)
 #define LED1_NODE DT_NODELABEL(led1)
 #define LED2_NODE DT_NODELABEL(led2)
 #define LED3_NODE DT_NODELABEL(led3)
+#define SW0_NODE DT_NODELABEL(button0)
 
 /* Create thread stack space */
 K_THREAD_STACK_DEFINE(thread_sensor_stack, STACK_SIZE);
@@ -75,6 +77,7 @@ static const struct gpio_dt_spec led0 = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 static const struct gpio_dt_spec led1 = GPIO_DT_SPEC_GET(LED1_NODE, gpios);
 static const struct gpio_dt_spec led2 = GPIO_DT_SPEC_GET(LED2_NODE, gpios);
 static const struct gpio_dt_spec led3 = GPIO_DT_SPEC_GET(LED3_NODE, gpios);
+static const struct gpio_dt_spec button = GPIO_DT_SPEC_GET(SW0_NODE, gpios);
 
 /* Create variables for thread data */
 struct k_thread thread_sensor_data;
@@ -99,7 +102,10 @@ void thread_sensor_code(void *argA, void *argB, void *argC);
 void thread_processing_code(void *argA, void *argB, void *argC);
 void thread_output_code(void *argA, void *argB, void *argC);
 int precedentsAverage(uint16_t *precedents, uint16_t current_read, uint16_t precedents_size);
-
+/* Define a variable of type static struct gpio_callback, which will latter be used to install the callback
+ *  It defines e.g. which pin triggers the callback
+ */
+static struct gpio_callback button_cb_data;
 
 /* Takes one sample */
 static int adc_sample(void)
@@ -127,12 +133,53 @@ static int adc_sample(void)
     return ret;
 }
 
+/* Define a callback function. It is like an ISR that is called when the button is pressed */
+void button_pressed(const struct device *dev, struct gpio_callback *cb, uint32_t pins)
+{
+    /* Toggle led1 */
+    int ret = gpio_pin_set_dt(&led0, 0);
+    if (ret < 0)
+        printk("SETTING LED VALUE FAILED");
+    ret = gpio_pin_set_dt(&led1, 0);
+    if (ret < 0)
+        printk("SETTING LED VALUE FAILED");
+    ret = gpio_pin_set_dt(&led2, 0);
+    if (ret < 0)
+        printk("SETTING LED VALUE FAILED");
+    ret = gpio_pin_set_dt(&led3, 0);
+    if (ret < 0)
+        printk("SETTING LED VALUE FAILED");
+    k_msleep(SLEEP_TIME_MS);
+
+    for (size_t i = 0; i < 10; i++)
+    {
+        gpio_pin_toggle_dt(&led0);
+        gpio_pin_toggle_dt(&led1);
+        gpio_pin_toggle_dt(&led2);
+        gpio_pin_toggle_dt(&led3);
+        k_msleep(SLEEP_TIME_MS);
+    }
+}
 
 /* Main function */
 void main(void)
 {
     int err = 0;
     int ret;
+
+    /* Check if device is ready */
+    if (!device_is_ready(led0.port) || !device_is_ready(led1.port) || !device_is_ready(led2.port) || !device_is_ready(led3.port))
+    {
+        printk("Error: leds are not ready\n");
+        return;
+    }
+
+    if (!device_is_ready(button.port))
+    {
+        printk("Error: button device %s is not ready\n", button.port->name);
+        return;
+    }
+
     /* Configure the GPIO pin for output */
     ret = gpio_pin_configure_dt(&led0, GPIO_OUTPUT_INACTIVE);
     if (ret < 0)
@@ -155,6 +202,26 @@ void main(void)
         return;
     }
 
+    ret = gpio_pin_configure_dt(&button, GPIO_INPUT | GPIO_PULL_UP);
+    if (ret < 0)
+    {
+        printk("Error: gpio_pin_configure_dt failed for button, error:%d", ret);
+        return;
+    }
+
+    /* Configure the interrupt on the button's pin */
+    ret = gpio_pin_interrupt_configure_dt(&button, GPIO_INT_EDGE_TO_ACTIVE);
+    if (ret < 0)
+    {
+        printk("Error: gpio_pin_interrupt_configure_dt failed for button, error:%d", ret);
+        return;
+    }
+
+    /* Initialize the static struct gpio_callback variable   */
+    gpio_init_callback(&button_cb_data, button_pressed, BIT(button.pin));
+
+    /* Add the callback function by calling gpio_add_callback()   */
+    gpio_add_callback(button.port, &button_cb_data);
 
     adc_dev = device_get_binding(DT_LABEL(ADC_NODE));
     if (!adc_dev)
@@ -231,7 +298,6 @@ void thread_sensor_code(void *argA, void *argB, void *argC)
                 /* ADC is set to use gain of 1/4 and reference VDD/4, so input range is 0...VDD (3 V), with 10 bit resolution */
                 printk("adc reading: raw:%4u / %4u mV: \n\r", adc_sample_buffer[0], (uint16_t)(1000 * adc_sample_buffer[0] * ((float)3 / 1023)));
                 ab = (uint16_t)(1000 * adc_sample_buffer[0] * ((float)3 / 1023));
-                ab = 8000;
                 printk("Thread A set ab value to: %d \n", ab);
             }
         }
@@ -289,19 +355,13 @@ void thread_output_code(void *argA, void *argB, void *argC)
 
     printk("Thread C init (sporadic, waits on a semaphore by task A)\n");
 
-    /* Check if device is ready */
-    if (!device_is_ready(led0.port) || !device_is_ready(led1.port) || !device_is_ready(led2.port) || !device_is_ready(led3.port))
-    {
-        return;
-    }
-
     while (1)
     {
         k_sem_take(&sem_bc, K_FOREVER);
         printk("Thread C instance %5ld released at time: %lld (ms). \n", ++nact, k_uptime_get());
         printk("Task C read bc value: %d\n", bc);
 
-        printk("\t%d\n",bc);
+        printk("\t%d\n", bc);
         if (bc < 1000)
         {
             ret = gpio_pin_set_dt(&led0, 1);
@@ -316,7 +376,6 @@ void thread_output_code(void *argA, void *argB, void *argC)
             ret = gpio_pin_set_dt(&led3, 1);
             if (ret < 0)
                 printk("SETTING LED VALUE FAILED");
-            
         }
         else if (bc < 2000)
         {
@@ -363,9 +422,6 @@ void thread_output_code(void *argA, void *argB, void *argC)
             if (ret < 0)
                 printk("SETTING LED VALUE FAILED");
         }
-
-       
-        
     }
 }
 
@@ -374,6 +430,5 @@ int precedentsAverage(uint16_t *precedents, uint16_t current_read, uint16_t prec
     int sum = 0;
     for (uint16_t i = 0; i < precedents_size; i++)
         sum += precedents[i];
-    return (sum + current_read) / (precedents_size+1);
+    return (sum + current_read) / (precedents_size + 1);
 }
-
