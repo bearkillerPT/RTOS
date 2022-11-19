@@ -9,7 +9,6 @@
  * 
  */
 
-
 #include <zephyr.h>
 #include <device.h>
 #include <drivers/gpio.h>
@@ -144,15 +143,15 @@ void main(void) {
     k_sem_init(&sem_bc, 0, 1);
     
     /* Create tasks */
-    thread_sensor_tid = k_thread_outputreate(&thread_sensor_data, thread_sensor_stack,
+    thread_sensor_tid = k_thread_create(&thread_sensor_data, thread_sensor_stack,
         K_THREAD_STACK_SIZEOF(thread_sensor_stack), thread_sensor_code,
         NULL, NULL, NULL, thread_sensor_prio, 0, K_NO_WAIT);
 
-    thread_processing_tid = k_thread_outputreate(&thread_processing_data, thread_processing_stack,
+    thread_processing_tid = k_thread_create(&thread_processing_data, thread_processing_stack,
         K_THREAD_STACK_SIZEOF(thread_processing_stack), thread_processing_code,
         NULL, NULL, NULL, thread_processing_prio, 0, K_NO_WAIT);
 
-    thread_processing_tid = k_thread_outputreate(&thread_output_data, thread_output_stack,
+    thread_processing_tid = k_thread_create(&thread_output_data, thread_output_stack,
         K_THREAD_STACK_SIZEOF(thread_output_stack), thread_output_code,
         NULL, NULL, NULL, thread_output_prio, 0, K_NO_WAIT);
 
@@ -183,8 +182,6 @@ void thread_sensor_code(void *argA , void *argB, void *argC)
         /* Do the workload */          
         printk("\n\nThread A instance %ld released at time: %lld (ms). \n",++nact, k_uptime_get());  
         
-        ab++;
-        printk("Thread A set ab value to: %d \n",ab); 
 
 
         err=adc_sample();
@@ -199,6 +196,7 @@ void thread_sensor_code(void *argA , void *argB, void *argC)
                 /* ADC is set to use gain of 1/4 and reference VDD/4, so input range is 0...VDD (3 V), with 10 bit resolution */
                 printk("adc reading: raw:%4u / %4u mV: \n\r",adc_sample_buffer[0],(uint16_t)(1000*adc_sample_buffer[0]*((float)3/1023)));
                 ab = (uint16_t)(1000*adc_sample_buffer[0]*((float)3/1023));
+                printk("Thread A set ab value to: %d \n",ab); 
             }
         } 
         
@@ -232,21 +230,20 @@ void thread_processing_code(void *argA , void *argB, void *argC)
         printk("Thread B instance %ld released at time: %lld (ms). \n",++nact, k_uptime_get());  
         printk("Task B read ab value: %d\n",ab);
         current_read = ab;
-        printk("Thread B set bc value to: %d \n",bc);  
+         
 
         if(iterations > 9){
             uint16_t avg = precedentsAverage(precedents, current_read, 10);
             bc = avg;
             k_sem_give(&sem_bc);
+            printk("avg([%d,%d,%d,%d,%d,%d,%d,%d,%d,%d]]) = %d, current=%d\n", precedents[0], precedents[1], precedents[2], precedents[3], precedents[4], precedents[5], precedents[6], precedents[7], precedents[8], precedents[9], avg, current_read);
 
-            printk("avg([%d,%d,%d,%d,%d]) = %d\n", precedents[0], precedents[1], precedents[2], precedents[3], current_read, avg);
-
-            precedents[iterations % 9] = current_read;
-
+            precedents[0] = current_read;
+            iterations = 1;
         }
         else
-            precedents[iterations] = current_read;
-
+            precedents[iterations++] = current_read;
+        printk("Thread B set bc value to: %d \n",bc); 
         
   }
 }
@@ -261,7 +258,7 @@ void thread_output_code(void *argA , void *argB, void *argC)
         k_sem_take(&sem_bc, K_FOREVER);
         printk("Thread C instance %5ld released at time: %lld (ms). \n",++nact, k_uptime_get());          
         printk("Task C read bc value: %d\n",bc);
-
+        
         
   }
 }
