@@ -134,7 +134,6 @@ void button_pressed(const struct device *dev, struct gpio_callback *cb, uint32_t
 {
 
     k_sem_give(&sem_button);
-    // k_sem_take(&sem_button,K_NO_WAIT);
 }
 
 /* Main function */
@@ -287,7 +286,7 @@ void thread_sensor_code(void *argA, void *argB, void *argC)
         /* Wait for next release instant */
         fin_time = k_uptime_get();
 
-        printk("fin time=  %lld, release_time= %lld, sub=%lld", fin_time, release_time,release_time-fin_time );
+        // when the task is interrupted by pressing button 0 (test button)
         if(fin_time - release_time > SAMP_PERIOD_MS){
             release_time += SAMP_PERIOD_MS*5;
         }
@@ -424,19 +423,18 @@ void thread_button_code(void *argA, void *argB, void *argC)
         k_thread_suspend(thread_processing_tid);
         k_thread_suspend(thread_output_tid);
 
-        ret = gpio_pin_set_dt(&led0, 0);
+        ret = gpio_pin_set_dt(&led0, 1);
         if (ret < 0)
             printk("SETTING LED VALUE FAILED");
-        ret = gpio_pin_set_dt(&led1, 0);
+        ret = gpio_pin_set_dt(&led1, 1);
         if (ret < 0)
             printk("SETTING LED VALUE FAILED");
-        ret = gpio_pin_set_dt(&led2, 0);
+        ret = gpio_pin_set_dt(&led2, 1);
         if (ret < 0)
             printk("SETTING LED VALUE FAILED");
-        ret = gpio_pin_set_dt(&led3, 0);
+        ret = gpio_pin_set_dt(&led3, 1);
         if (ret < 0)
             printk("SETTING LED VALUE FAILED");
-        k_msleep(SLEEP_TIME_MS);
 
         for (size_t i = 0; i < 10; i++)
         {
