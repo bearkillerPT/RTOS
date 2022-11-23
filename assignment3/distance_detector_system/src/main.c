@@ -1,3 +1,6 @@
+// This code was based on the examples folder available on the elearning site, which was based on the nordic documentation examples.
+// base documentation: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/reference/kernel/index.html
+
 
 #include <zephyr.h>
 #include <device.h>
@@ -285,11 +288,6 @@ void thread_sensor_code(void *argA, void *argB, void *argC)
 
         /* Wait for next release instant */
         fin_time = k_uptime_get();
-
-        // when the task is interrupted by pressing button 0 (test button)
-        if(fin_time - release_time > SAMP_PERIOD_MS){
-            release_time += SAMP_PERIOD_MS*5;
-        }
         if (fin_time < release_time)
         {
             k_msleep(release_time - fin_time);
@@ -419,8 +417,7 @@ void thread_button_code(void *argA, void *argB, void *argC)
     {
         k_sem_take(&sem_button, K_FOREVER);
 
-        k_thread_suspend(thread_sensor_tid);
-        k_thread_suspend(thread_processing_tid);
+        // suspend output task so it doesn't interfere with blinking leds while in test mode
         k_thread_suspend(thread_output_tid);
 
         ret = gpio_pin_set_dt(&led0, 1);
@@ -444,10 +441,10 @@ void thread_button_code(void *argA, void *argB, void *argC)
             gpio_pin_toggle_dt(&led3);
             k_msleep(SLEEP_TIME_MS);
         }
-
-        k_thread_resume(thread_sensor_tid);
-        k_thread_resume(thread_processing_tid);
+        
+        // resume normal execution of the program
         k_thread_resume(thread_output_tid);
+
     }
 }
 
