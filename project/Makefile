@@ -18,7 +18,7 @@ serialTest: serialTest.c
 clean:
 	rm -f *.c~ 
 	rm -f *.o
-	rm pt_a1 pt_a2 pt_a3
+	rm imageProcAlg serialTest
 
 # Some notes
 # $@ represents the left side of the ":"
