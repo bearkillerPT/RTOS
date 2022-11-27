@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <math.h>
 
 /* Some defines that are usefull to make the SW more readable */
 /* and adaptable */ 
@@ -84,7 +85,7 @@ int guideLineSearch(uint8_t imageBuf[IMGWIDTH][IMGWIDTH], int16_t *pos, float *a
 		printf("Failed to find guideline pos=%d, gf_pos=%d", *pos, gf_pos);
 		return -1;
 	}
-		
+
 	/* Approach very grossly the angle (NOT a valid solution - just for testing ) */
 	if(*pos==gf_pos){
 		*angle=0;
