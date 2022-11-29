@@ -4,5 +4,7 @@
     ],
     "files.associations": {
         "random": "c"
-    }
+    },
+    "nrf-connect.topdir": "${nrf-connect.sdk:2.0.1}",
+    "nrf-connect.toolchain.path": "PATH"
 }
