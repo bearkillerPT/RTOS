@@ -15,15 +15,15 @@
 
 /* Some defines that are usefull to make the SW more readable */
 /* and adaptable */
-#define IMGWIDTH 128			  /* Square image. Side size, in pixels*/
-#define BACKGROUND_COLOR 0x00 /* Color of the background */
-#define GUIDELINE_COLOR 0xFF  /* Guideline color */
-#define OBSTACLE_COLOR 0x80	  /* Obstacle color */
-#define GN_ROW 0			  /* Row to look for the guiode line - close */
-#define GF_ROW (IMGWIDTH - 1) /* Row to look for the guiode line - far */
-#define NOB_ROW (IMGWIDTH / 2)			  /* Row to look for near obstacles */
-#define NOB_COL (IMGWIDTH / 4)			  /* Col to look for near obstacles */
-#define NOB_WIDTH (IMGWIDTH / 2)			  /* WIDTH of the sensor area */
+#define IMGWIDTH 128			 /* Square image. Side size, in pixels*/
+#define BACKGROUND_COLOR 0x00	 /* Color of the background */
+#define GUIDELINE_COLOR 0xFF	 /* Guideline color */
+#define OBSTACLE_COLOR 0x80		 /* Obstacle color */
+#define GN_ROW 0				 /* Row to look for the guiode line - close */
+#define GF_ROW (IMGWIDTH - 1)	 /* Row to look for the guiode line - far */
+#define NOB_ROW (IMGWIDTH / 2)	 /* Row to look for near obstacles */
+#define NOB_COL (IMGWIDTH / 4)	 /* Col to look for near obstacles */
+#define NOB_WIDTH (IMGWIDTH / 2) /* WIDTH of the sensor area */
 
 /* One example image. In raw/gray format an image is an array of
  * bytes, one per pixel, with values that represent intensity and range
@@ -146,14 +146,31 @@ int guideLineSearch(uint8_t imageBuf[IMGWIDTH][IMGWIDTH], int16_t *pos, float *a
 }
 
 /* Function to look for closeby obstacles */
-/* Not implemented */
 int nearObstSearch(uint8_t imageBuf[IMGWIDTH][IMGWIDTH])
 {
+	int i, j;
 
+	for (j = 0; j < NOB_ROW; j++)
+	{
+		int inObs = 0;
+		for (i = NOB_COL; i < NOB_COL * 3; i++)
+		{
+			if (imageBuf[j][i] == OBSTACLE_COLOR)
+			{
+				inObs++;
+			}
+			else if (inObs > 1)
+			{
+				inObs = 0;
+			}
+			if (inObs > 1)
+				return 1;
+		}
+	}
 	return 0;
 }
 
-/* Function that counts obstacles.
+/* Function that counts obstacles.*/
 int obstCount(uint8_t imageBuf[IMGWIDTH][IMGWIDTH])
 {
 	int i, j, nobs;
@@ -201,4 +218,8 @@ int main()
 	printf("Detecting number of obstacles ...");
 	res = obstCount(vertical_guide_image_data);
 	printf("%d obstacles detected\n\r", res);
+
+	printf("Detecting closeby obstacles ...");
+	res = nearObstSearch(vertical_guide_image_data);
+	printf("Closeby obstacles detected: %s\n\r", res == 1 ? "Yes" : "No");
 }
