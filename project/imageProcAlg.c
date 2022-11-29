@@ -15,15 +15,15 @@
 
 /* Some defines that are usefull to make the SW more readable */
 /* and adaptable */
-#define IMGWIDTH 16			  /* Square image. Side size, in pixels*/
+#define IMGWIDTH 128			  /* Square image. Side size, in pixels*/
 #define BACKGROUND_COLOR 0x00 /* Color of the background */
 #define GUIDELINE_COLOR 0xFF  /* Guideline color */
 #define OBSTACLE_COLOR 0x80	  /* Obstacle color */
 #define GN_ROW 0			  /* Row to look for the guiode line - close */
 #define GF_ROW (IMGWIDTH - 1) /* Row to look for the guiode line - far */
-#define NOB_ROW 3			  /* Row to look for near obstacles */
-#define NOB_COL 5			  /* Col to look for near obstacles */
-#define NOB_WIDTH 5			  /* WIDTH of the sensor area */
+#define NOB_ROW (IMGWIDTH / 2)			  /* Row to look for near obstacles */
+#define NOB_COL (IMGWIDTH / 4)			  /* Col to look for near obstacles */
+#define NOB_WIDTH (IMGWIDTH / 2)			  /* WIDTH of the sensor area */
 
 /* One example image. In raw/gray format an image is an array of
  * bytes, one per pixel, with values that represent intensity and range
@@ -154,7 +154,6 @@ int nearObstSearch(uint8_t imageBuf[IMGWIDTH][IMGWIDTH])
 }
 
 /* Function that counts obstacles.
-/* Crude version. Only works if one obstacle per row at max. */
 int obstCount(uint8_t imageBuf[IMGWIDTH][IMGWIDTH])
 {
 	int i, j, nobs;
