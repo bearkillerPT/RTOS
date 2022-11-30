@@ -156,7 +156,7 @@ uint8_t vertical_guide_image_data[IMGWIDTH][IMGWIDTH] =
 /* Size of stack area used by each thread (can be thread specific, if necessary)*/
 #define STACK_SIZE 1024
 
-#define SAMP_PERIOD_MS 10
+#define SAMP_PERIOD_MS 1000
 
 /* Thread scheduling priority */
 #define thread_near_obstacle_prio 1
@@ -200,7 +200,7 @@ void main(void)
 /* Thread code implementation */
 void thread_near_obstacle_code(void *argA, void *argB, void *argC)
 {
-    int64_t release_time = 0, fin_time = 0, t_min = SAMP_PERIOD_MS, t_max = SAMP_PERIOD_MS;
+    int64_t release_time = 0, fin_time = 0, t_prev = 0, t_min = SAMP_PERIOD_MS, t_max = SAMP_PERIOD_MS;
 
     printk("Thread near_obstacle init (periodic)\n");
 
@@ -245,19 +245,18 @@ void thread_near_obstacle_code(void *argA, void *argB, void *argC)
         /* Wait for next release instant */
         fin_time = k_uptime_get();
         
-        if (fin_time - release_time + SAMP_PERIOD_MS < t_min)
-            t_min = fin_time - release_time + SAMP_PERIOD_MS;
-        else if (fin_time - release_time + SAMP_PERIOD_MS > t_max)
-            t_max = fin_time - release_time + SAMP_PERIOD_MS;
+        if (fin_time - t_prev < t_min)
+            t_min = fin_time - t_prev;
+        else if (fin_time - t_prev > t_max)
+            t_max = fin_time - t_prev;
+            
+        t_prev = fin_time;
 
         printk("Task %s arrived at %lld inter-arrival time (us): min: %lld / max: %lld \n\r", "near obstacle", (long long)k_uptime_get(), t_min, t_max);
         if (fin_time < release_time)
         {
             k_msleep(release_time - fin_time);
             release_time += SAMP_PERIOD_MS;
-        }
-        else{
-            release_time = fin_time + SAMP_PERIOD_MS;
         }
 
         
