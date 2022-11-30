@@ -214,7 +214,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=dataflow_shmem_threads
+CMAKE_PROJECT_NAME:STATIC=obstacle_detector_system
 
 //Value Computed by CMake
 CMAKE_PROJECT_VERSION:STATIC=3.0.99
@@ -386,13 +386,13 @@ civetweb_IS_TOP_LEVEL:STATIC=OFF
 civetweb_SOURCE_DIR:STATIC=/home/rt/ncs/modules/lib/civetweb
 
 //Value Computed by CMake
-dataflow_shmem_threads_BINARY_DIR:STATIC=/home/rt/Desktop/RTOS/project/obstacle_detector_system/build
+obstacle_detector_system_BINARY_DIR:STATIC=/home/rt/Desktop/RTOS/project/obstacle_detector_system/build
 
 //Value Computed by CMake
-dataflow_shmem_threads_IS_TOP_LEVEL:STATIC=ON
+obstacle_detector_system_IS_TOP_LEVEL:STATIC=ON
 
 //Value Computed by CMake
-dataflow_shmem_threads_SOURCE_DIR:STATIC=/home/rt/Desktop/RTOS/project/obstacle_detector_system
+obstacle_detector_system_SOURCE_DIR:STATIC=/home/rt/Desktop/RTOS/project/obstacle_detector_system
 
 
 ########################
