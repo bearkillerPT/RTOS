@@ -163,38 +163,53 @@ uint8_t vertical_guide_image_data[IMGWIDTH][IMGWIDTH] =
 /* Semaphores for task synch */
 struct k_sem sem_rcvimg_nearobs;
 struct k_sem sem_rcvimg_orientation;
+struct k_sem sem_nearobs_output;
+struct k_sem sem_orientation_output;
+
+/* Global vars (shared memory between tasks) */
+char nearobs_output [10] = "---"; // Yes or No
+char orientation_output [2][10] = {{"000"},{"000.000"}}; // position and angle
 
 /* Thread scheduling priority */
 #define thread_receive_image_prio 5
-#define thread_near_obstacle_prio 4
-#define thread_orientation_prio 3
-
+#define thread_near_obstacle_prio 3
+#define thread_orientation_prio 2
+#define thread_output_prio 4
 
 /* Create thread stack space */
 K_THREAD_STACK_DEFINE(thread_receive_image_stack, STACK_SIZE);
 K_THREAD_STACK_DEFINE(thread_near_obstacle_stack, STACK_SIZE);
 K_THREAD_STACK_DEFINE(thread_orientation_stack, STACK_SIZE);
+K_THREAD_STACK_DEFINE(thread_output_stack, STACK_SIZE);
 
 /* Create variables for thread data */
 struct k_thread thread_receive_image_data;
 struct k_thread thread_near_obstacle_data;
 struct k_thread thread_orientation_data;
+struct k_thread thread_output_data;
+
 
 /* Create task IDs */
-k_tid_t thread_near_obstacle_tid;
 k_tid_t thread_receive_image_tid;
+k_tid_t thread_near_obstacle_tid;
 k_tid_t thread_orientation_tid;
+k_tid_t thread_output_tid;
+
 
 /* Thread code prototypes */
 void thread_near_obstacle_code(void *argA, void *argB, void *argC);
 void thread_receive_image_code(void *argA, void *argB, void *argC);
 void thread_orientation_code(void *argA, void *argB, void *argC);
+void thread_output_code(void *argA, void *argB, void *argC);
 
 /* Main function */
 void main(void)
 {
     k_sem_init(&sem_rcvimg_nearobs, 0, 1);
     k_sem_init(&sem_rcvimg_orientation, 0, 1);
+    k_sem_init(&sem_nearobs_output, 0, 1);
+    k_sem_init(&sem_orientation_output, 0, 1);
+    
     
 
     /* Create tasks */
@@ -207,6 +222,9 @@ void main(void)
     thread_orientation_tid = k_thread_create(&thread_orientation_data, thread_orientation_stack,
                                                K_THREAD_STACK_SIZEOF(thread_orientation_stack), thread_orientation_code,
                                                NULL, NULL, NULL, thread_orientation_prio, 0, K_NO_WAIT);
+    thread_output_tid = k_thread_create(&thread_output_data, thread_output_stack,
+                                               K_THREAD_STACK_SIZEOF(thread_output_stack), thread_output_code,
+                                               NULL, NULL, NULL, thread_output_prio, 0, K_NO_WAIT);
 
     return;
 }
@@ -294,9 +312,12 @@ void thread_near_obstacle_code(void *argA, void *argB, void *argC)
                     res=1;
             }
         }
+
+
+        strcpy(nearobs_output, res == 1 ? "Yes" : "No");
+        k_sem_give(&sem_nearobs_output);
         
         
-        printk("\tCloseby obstacles detected: %s\n\r", res == 1 ? "Yes" : "No");
 
         
 
@@ -382,10 +403,51 @@ void thread_orientation_code(void *argA, void *argB, void *argC)
                 angle = -angle;
         }
 
-        char angle_buf[20];
-        gcvt (angle, 6, angle_buf);
+        // write data on shared memory
+        itoa(pos, orientation_output[0], 10);
+        gcvt (angle, 6, orientation_output[1]);
+        
+        k_sem_give(&sem_orientation_output);
 
-        printf("\tRobot position=%d, guideline angle = %s\n\r", pos, angle_buf);
+        
+        
+        /* Wait for next release instant */
+        fin_time = k_uptime_get();
+        
+        if (fin_time - t_prev < t_min)
+            t_min = fin_time - t_prev;
+        else if (fin_time - t_prev > t_max)
+            t_max = fin_time - t_prev;
+            
+        t_prev = fin_time;
+
+        // printk("Task %s arrived at %lld inter-arrival time (us): min: %lld / max: %lld \n\r", "near obstacle", (long long)k_uptime_get(), t_min, t_max);
+
+        
+    }
+}
+
+void thread_output_code(void *argA, void *argB, void *argC)
+{
+    int64_t release_time = 0, fin_time = 0, t_prev = 0, t_min = SAMP_PERIOD_MS, t_max = SAMP_PERIOD_MS;
+    int16_t pos = -1;
+    float angle = -1;
+    printk("Thread output init\n");
+
+    /* Compute next release instant */
+    release_time = k_uptime_get() + SAMP_PERIOD_MS;
+
+    /* Thread loop */
+    while (1)
+    {
+        /* Do the workload */
+        k_sem_take(&sem_nearobs_output, K_FOREVER);
+        printk("\tCloseby obstacles detected: %s\n\r", nearobs_output);
+        
+        k_sem_take(&sem_orientation_output, K_FOREVER);
+        printf("\tRobot position=%s, guideline angle=%s\n\r", orientation_output[0], orientation_output[1]);
+
+        // printf("\tRobot position=%d, guideline angle = %s\n\r", pos, angle_buf);
         
         /* Wait for next release instant */
         fin_time = k_uptime_get();
