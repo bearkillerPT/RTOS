@@ -86,7 +86,7 @@ int main()
     return 1;
   }
 
-  for (int image_index = 0; image_index < 100; image_index++)
+  for (int image_index = 1; image_index < 100; image_index++)
   {
     uint8_t *imageBuffer = calloc(IMGWIDTH * IMGWIDTH, sizeof(char));
     char *filename = calloc(9, sizeof(char));
