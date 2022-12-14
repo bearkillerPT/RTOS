@@ -19,8 +19,9 @@ struct cab {
 //creates a new cab
 cab * open_cab(char * name, size_t num, uint8_t dim, uint8_t ** first){
 
-    cab * new_cab = malloc((sizeof(name) / sizeof(name[0]))*sizeof(size_t)*sizeof(uint8_t)*sizeof(uint8_t)*dim);
-    new_cab->size = (sizeof(name) / sizeof(name[0]))*sizeof(size_t)*sizeof(uint8_t)*sizeof(uint8_t)*dim;
+    cab * new_cab = malloc(sizeof(cab));
+    new_cab-> size = sizeof(cab);
+    new_cab-> name = name;
     new_cab-> num = num;
     new_cab-> dim = dim;
 
@@ -29,7 +30,7 @@ cab * open_cab(char * name, size_t num, uint8_t dim, uint8_t ** first){
     new_cab->buffers[0] = (uint8_t**)malloc(IMGWIDTH * sizeof(uint8_t*));
     for (uint8_t j = 0; j < IMGWIDTH; j++)
         new_cab->buffers[0][j] = (uint8_t*)malloc(IMGWIDTH * sizeof(uint8_t));
-    new_cab->buff_size = sizeof(uint8_t**) + IMGWIDTH * sizeof(uint8_t*) + IMGWIDTH *IMGWIDTH *sizeof(uint8_t);
+    new_cab->buff_size = sizeof(uint8_t**) + IMGWIDTH * sizeof(uint8_t*) + IMGWIDTH*IMGWIDTH*sizeof(uint8_t);
     new_cab->buffers[0] = first;
     new_cab->nBuffers = 1;
     return new_cab;
@@ -74,6 +75,16 @@ void put_mes (uint8_t ** buf_pointer, cab * cab_id){
     free(buf_pointer);
 }
 
+// get latest message
+uint8_t ** get_mes (cab * cab_id){
+    return cab_id->buffers[0];
+}
+
+// release message to the CAB 
+void unget (uint8_t ** mes_pointer, cab * cab_id){
+    
+}
+
 int main(int argc, char const *argv[]){
 
     uint8_t ** img1 = (uint8_t**) malloc(IMGWIDTH*sizeof(uint8_t*));
@@ -94,7 +105,7 @@ int main(int argc, char const *argv[]){
     // testing
     cab * cab1;
     cab1 = open_cab("images", 3, IMGWIDTH*IMGWIDTH, img1);
-    printf("cab %s -> num=%ld, dim=%d, first[0][0][0]=%d\n", cab1->name, cab1->num, cab1->dim, cab1->buffers[0][0][2]);
+    printf("cab %s -> num=%ld, dim=%d, size=%ld, size_buffers=%ld,  first[0][0][2]=%d\n", cab1->name, cab1->num, cab1->dim, cab1->size, cab1->buff_size, cab1->buffers[0][0][2]);
     
     uint8_t ** free_buffer = reserve(cab1);
 
@@ -109,29 +120,7 @@ int main(int argc, char const *argv[]){
         for (size_t j = 0; j < IMGWIDTH; j++)
             free_buffer[i][j] = diagonal[i][j];
 
-    for (size_t i = 0; i < IMGWIDTH; i++){
-        for (size_t j = 0; j < IMGWIDTH; j++){
-            printf("%d, ", cab1->buffers[0][i][j]);
-        }
-        printf("\n");
-    }
-
     put_mes(free_buffer, cab1);
-
-    for (size_t i = 0; i < IMGWIDTH; i++){
-        for (size_t j = 0; j < IMGWIDTH; j++){
-            printf("%d, ", cab1->buffers[0][i][j]);
-        }
-        printf("\n");
-    }
-
-    for (size_t i = 0; i < IMGWIDTH; i++){
-        for (size_t j = 0; j < IMGWIDTH; j++){
-            printf("%d, ", cab1->buffers[1][i][j]);
-        }
-        printf("\n");
-    }
-
 
     free_buffer = reserve(cab1);
 
