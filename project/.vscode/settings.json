@@ -3,5 +3,9 @@
         "${workspaceFolder}/obstacle_detector_system"
     ],
     "nrf-connect.topdir": "${nrf-connect.sdk:2.0.1}",
-    "nrf-connect.toolchain.path": "PATH"
+    "nrf-connect.toolchain.path": "PATH",
+    "files.associations": {
+        "stdio.h": "c",
+        "stddef.h": "c"
+    }
 }
