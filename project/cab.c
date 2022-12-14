@@ -28,9 +28,7 @@ cab * open_cab(char * name, size_t num, uint8_t dim, uint8_t ** first){
     new_cab->buffers = (uint8_t***) malloc(sizeof(uint8_t**));
     new_cab->buffers[0] = (uint8_t**)malloc(IMGWIDTH * sizeof(uint8_t*));
     for (uint8_t j = 0; j < IMGWIDTH; j++)
-    {
         new_cab->buffers[0][j] = (uint8_t*)malloc(IMGWIDTH * sizeof(uint8_t));
-    }
     new_cab->buff_size = sizeof(uint8_t**) + IMGWIDTH * sizeof(uint8_t*) + IMGWIDTH *IMGWIDTH *sizeof(uint8_t);
     new_cab->buffers[0] = first;
     new_cab->nBuffers = 1;
@@ -46,23 +44,19 @@ uint8_t ** reserve(cab * cab_id){
     uint8_t ** new_buffer = (uint8_t**)malloc(IMGWIDTH * sizeof(uint8_t*));
     
     for (uint8_t j = 0; j < IMGWIDTH; j++)
-    {
         new_buffer[j] = (uint8_t*)malloc(IMGWIDTH * sizeof(uint8_t));
-    }
     return new_buffer;
 }
 
 //puts a filled buffer inside the CAB
 void put_mes (uint8_t ** buf_pointer, cab * cab_id){
-    int n = cab_id->nBuffers;
-
+    // allocate new buffer in CAB
     cab_id->buffers[cab_id->nBuffers] = (uint8_t**)malloc(IMGWIDTH * sizeof(uint8_t*));
-    
     for (uint8_t j = 0; j < IMGWIDTH; j++)
-    {
         cab_id->buffers[cab_id->nBuffers][j] = (uint8_t*)malloc(IMGWIDTH * sizeof(uint8_t));
-    }
     
+    // push back existing buffers
+    int n = cab_id->nBuffers;
     while(n > 0){
         for (size_t i = 0; i < IMGWIDTH; i++)
             for (size_t j = 0; j < IMGWIDTH; j++)
