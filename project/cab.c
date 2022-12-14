@@ -11,8 +11,6 @@ struct cab {
    size_t num;
    uint8_t dim;
    uint8_t *** buffers;
-   size_t buff_size;
-   size_t size;
    size_t nBuffers;
 };
 
@@ -20,7 +18,6 @@ struct cab {
 cab * open_cab(char * name, size_t num, uint8_t dim, uint8_t ** first){
 
     cab * new_cab = malloc(sizeof(cab));
-    new_cab-> size = sizeof(cab);
     new_cab-> name = name;
     new_cab-> num = num;
     new_cab-> dim = dim;
@@ -30,7 +27,6 @@ cab * open_cab(char * name, size_t num, uint8_t dim, uint8_t ** first){
     new_cab->buffers[0] = (uint8_t**)malloc(IMGWIDTH * sizeof(uint8_t*));
     for (uint8_t j = 0; j < IMGWIDTH; j++)
         new_cab->buffers[0][j] = (uint8_t*)malloc(IMGWIDTH * sizeof(uint8_t));
-    new_cab->buff_size = sizeof(uint8_t**) + IMGWIDTH * sizeof(uint8_t*) + IMGWIDTH*IMGWIDTH*sizeof(uint8_t);
     new_cab->buffers[0] = first;
     new_cab->nBuffers = 1;
     return new_cab;
@@ -39,9 +35,6 @@ cab * open_cab(char * name, size_t num, uint8_t dim, uint8_t ** first){
 //returns a new buffer
 uint8_t ** reserve(cab * cab_id){
     // allocate another buffer 
-    cab_id->size += cab_id->buff_size;
-    cab_id->buff_size *= 2;
-    cab_id->buffers = (uint8_t***) realloc(cab_id->buffers, cab_id->buff_size);
     uint8_t ** new_buffer = (uint8_t**)malloc(IMGWIDTH * sizeof(uint8_t*));
     
     for (uint8_t j = 0; j < IMGWIDTH; j++)
@@ -105,7 +98,7 @@ int main(int argc, char const *argv[]){
     // testing
     cab * cab1;
     cab1 = open_cab("images", 3, IMGWIDTH*IMGWIDTH, img1);
-    printf("cab %s -> num=%ld, dim=%d, size=%ld, size_buffers=%ld,  first[0][0][2]=%d\n", cab1->name, cab1->num, cab1->dim, cab1->size, cab1->buff_size, cab1->buffers[0][0][2]);
+    printf("cab %s -> num=%ld, dim=%d,  first[0][0][2]=%d\n", cab1->name, cab1->num, cab1->dim, cab1->buffers[0][0][2]);
     
     uint8_t ** free_buffer = reserve(cab1);
 
@@ -122,6 +115,7 @@ int main(int argc, char const *argv[]){
 
     put_mes(free_buffer, cab1);
 
+
     free_buffer = reserve(cab1);
 
     uint8_t diagonal2[5][5] = {{0,0,0,0,255}, 
@@ -135,6 +129,7 @@ int main(int argc, char const *argv[]){
             free_buffer[i][j] = diagonal2[i][j];
     
     put_mes(free_buffer, cab1);
+
 
     for (size_t i = 0; i < IMGWIDTH; i++){
         for (size_t j = 0; j < IMGWIDTH; j++){
