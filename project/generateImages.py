@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import copy
+import os
 
 image_set = [None, None, None, None, None, None, None]
 
@@ -25,16 +26,17 @@ with open("imageBib/right23", "rb") as imageFile:
 with open("imageBib/right64", "rb") as imageFile:
     image_set[6] = np.fromfile(imageFile, dtype=np.uint8)
 
+# make sure the images directory exists 
+if not os.path.exists("images"):
+    os.makedirs("images")
+
 object_x = 45
 object_width = 20
 object_height = 20
 direction_choice = 0
 if len([x for x in image_set if x is not None]) == len(image_set):
     for i in range(1, 100):
-        if i < 30:
-            direction_choice = random.randint(0, 6)
-        else:
-            direction_choice = random.randint(3, 6)
+        direction_choice = random.randint(3, 6)
         with open("images/img" + str(i) + ".raw", "wb") as binary_file:
             selected_image = copy.deepcopy(
                 image_set[direction_choice].reshape(128, 128))
