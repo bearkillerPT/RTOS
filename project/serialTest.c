@@ -41,6 +41,7 @@ int main()
 {
   // Open the serial port. Change device path as needed (currently set to an standard FTDI USB-UART cable type device)
   int serial_port = open("/dev/ttyACM0", O_RDWR);
+  
 
   // Create new termios struct, we call it 'tty' for convention
   struct termios tty;
@@ -51,6 +52,7 @@ int main()
     printf("Error %i from tcgetattr: %s\n", errno, strerror(errno));
     return 1;
   }
+  
 
   tty.c_cflag &= ~PARENB;        // Clear parity bit, disabling parity (most common)
   tty.c_cflag &= ~CSTOPB;        // Clear stop field, only one stop bit used in communication (most common)
@@ -85,17 +87,21 @@ int main()
     printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
     return 1;
   }
+  
 
   for (int image_index = 1; image_index < 100; image_index++)
   {
     uint8_t *imageBuffer = calloc(IMGWIDTH * IMGWIDTH, sizeof(char));
-    char *filename = calloc(9, sizeof(char));
-    sprintf(filename, "img%d.raw", image_index);
+    char *filename = calloc(20, sizeof(char));
+    sprintf(filename, "images/img%d.raw", image_index);
+    
     readRawImage(filename, imageBuffer);
+    
+    
     // Read bytes. The behaviour of read() (e.g. does it block?,
     // how long does it block for?) depends on the configuration
     // settings above, specifically VMIN and VTIME
-    ssize_t bytes_written = write(serial_port, imageBuffer, IMGWIDTH * IMGWIDTH);
+    ssize_t bytes_written = write(serial_port, imageBuffer, sizeof(uint8_t) * IMGWIDTH * IMGWIDTH);
 
     // n is the number of bytes read. n may be 0 if no bytes were received, and can also be -1 to signal an error.
     if (bytes_written < 0)
@@ -105,7 +111,12 @@ int main()
     }
     else
       printf("Sent %i bytes", bytes_written);
+
+    fflush(stdout);
+    exit(9);
   }
+
+
 
   close(serial_port);
   return 0; // success

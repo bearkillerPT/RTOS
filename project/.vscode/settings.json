@@ -6,6 +6,7 @@
     "nrf-connect.toolchain.path": "PATH",
     "files.associations": {
         "stdio.h": "c",
-        "stddef.h": "c"
+        "stddef.h": "c",
+        "cab.h": "c"
     }
 }

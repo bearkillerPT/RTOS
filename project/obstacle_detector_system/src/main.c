@@ -3,7 +3,8 @@
 
 #include <zephyr.h>
 #include <device.h>
-#include <drivers/gpio.h>
+// #include <drivers/gpio.h>
+#include <drivers/uart.h>
 #include <sys/printk.h>
 #include <sys/__assert.h>
 #include <string.h>
@@ -12,6 +13,8 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
+// #include "cab.h"
+
 
 // Image constants
 #define IMGWIDTH 128             /* Square image. Side size, in pixels*/
@@ -23,6 +26,7 @@
 #define NOB_ROW (IMGWIDTH / 2)   /* Row to look for near obstacles */
 #define NOB_COL (IMGWIDTH / 4)   /* Col to look for near obstacles */
 #define NOB_WIDTH (IMGWIDTH / 2) /* WIDTH of the sensor area */
+
 
 uint8_t vertical_guide_image_data[IMGWIDTH][IMGWIDTH] =
     {
@@ -161,12 +165,14 @@ uint8_t vertical_guide_image_data[IMGWIDTH][IMGWIDTH] =
 #define SAMP_PERIOD_MS 1000
 
 /* Semaphores for task sync */
+struct k_sem sem_rcvimg;
 struct k_sem sem_rcvimg_nearobs;
 struct k_sem sem_rcvimg_orientation;
 struct k_sem sem_rcvimg_obscount;
 struct k_sem sem_nearobs_output;
 struct k_sem sem_orientation_output;
 struct k_sem sem_obscount_output;
+
 
 
 /* Global vars (shared memory between tasks) */
@@ -205,6 +211,34 @@ k_tid_t thread_orientation_tid;
 k_tid_t thread_output_tid;
 k_tid_t thread_obscount_tid;
 
+/* image receiver*/
+uint8_t ** receiveImage();
+
+// //UART 
+#define FATAL_ERR -1 /* Fatal error return code, app terminates */
+
+#define UART_NODE DT_NODELABEL(uart0)    /* UART Node label, see dts */
+
+#define RXBUF_SIZE IMGWIDTH*IMGWIDTH                   /* RX buffer size */
+#define RX_TIMEOUT 1000                  /* Inactivity period after the instant when last char was received that triggers an rx event (in us) */
+
+/* Struct for UART configuration (if using default values is not needed) */
+const struct uart_config uart_cfg = {
+		.baudrate = 115200,
+		.parity = UART_CFG_PARITY_NONE,
+		.stop_bits = UART_CFG_STOP_BITS_1,
+		.data_bits = UART_CFG_DATA_BITS_8,
+		.flow_ctrl = UART_CFG_FLOW_CTRL_NONE
+};
+
+/* UAR related variables */
+const struct device *uart_dev;          /* Pointer to device struct */ 
+static uint8_t rx_buf[RXBUF_SIZE];      /* RX buffer, to store received data */
+static uint8_t rx_chars[RXBUF_SIZE];    /* chars actually received  */
+volatile int uart_rxbuf_nchar=0;        /* Number of chars currnetly on the rx buffer */
+
+/* UART callback function prototype */
+static void uart_cb(const struct device *dev, struct uart_event *evt, void *user_data);
 
 /* Thread code prototypes */
 void thread_near_obstacle_code(void *argA, void *argB, void *argC);
@@ -216,6 +250,43 @@ void thread_obscount_code(void *argA, void *argB, void *argC);
 /* Main function */
 void main(void)
 {
+    //UART
+    int err;
+    /* Bind to UART */
+    uart_dev= device_get_binding(DT_LABEL(UART_NODE));
+    if (uart_dev == NULL) {
+        printk("device_get_binding() error for device %s!\n\r", DT_LABEL(UART_NODE));
+        return;
+    }
+    else {
+        printk("UART binding successful\n\r");
+    }
+
+    /* Configure UART */
+    err = uart_configure(uart_dev, &uart_cfg);
+    if (err == -ENOSYS) { /* If invalid configuration */
+        printk("uart_configure() error. Invalid configuration\n\r");
+        return; 
+    }
+
+    /* Enable data reception */
+    err =  uart_rx_enable(uart_dev ,rx_buf,sizeof(rx_buf),RX_TIMEOUT);
+    if (err) {
+        printk("uart_rx_enable() error. Error code:%d\n\r",err);
+        return;
+    }
+
+    /* Register callback */
+    err = uart_callback_set(uart_dev, uart_cb, NULL);
+    if (err) {
+        printk("uart_callback_set() error. Error code:%d\n\r",err);
+        return;
+    }
+
+
+
+
+    k_sem_init(&sem_rcvimg, 0, 1);
     k_sem_init(&sem_rcvimg_nearobs, 0, 1);
     k_sem_init(&sem_rcvimg_orientation, 0, 1);
     k_sem_init(&sem_nearobs_output, 0, 1);
@@ -259,15 +330,15 @@ void thread_receive_image_code(void *argA, void *argB, void *argC)
     while (1)
     {
         /* Code for receiving image */
-
-
-
+        k_sem_take(&sem_rcvimg, K_FOREVER);
+        
+        receiveImage();
 
         /*--------------------------*/
 
-        k_sem_give(&sem_rcvimg_nearobs);
-        k_sem_give(&sem_rcvimg_orientation);
-        k_sem_give(&sem_rcvimg_obscount);
+        // k_sem_give(&sem_rcvimg_nearobs);
+        // k_sem_give(&sem_rcvimg_orientation);
+        // k_sem_give(&sem_rcvimg_obscount);
         
 
         /* Wait for next release instant */
@@ -281,12 +352,6 @@ void thread_receive_image_code(void *argA, void *argB, void *argC)
         t_prev = fin_time;
 
         printk("Task %s arrived at %lld inter-arrival time (us): min: %lld / max: %lld \n\r", "rcv img", (long long)k_uptime_get(), t_min, t_max);
-
-        if (fin_time < release_time)
-        {
-            k_msleep(release_time - fin_time);
-            release_time += SAMP_PERIOD_MS;
-        }
 
         
     }
@@ -534,6 +599,117 @@ void thread_obscount_code(void *argA, void *argB, void *argC)
 
         
     }
+}
+
+uint8_t ** receiveImage(){
+        
+        uint8_t ** image = (uint8_t **) malloc(IMGWIDTH * sizeof(uint8_t *));
+        for (int i = 0; i < IMGWIDTH; i++)
+            image[i] = (uint8_t *) malloc(IMGWIDTH * sizeof(uint8_t));
+
+        printk("%d\n", uart_rxbuf_nchar);
+        if(uart_rxbuf_nchar == RXBUF_SIZE){
+            for(int i = 0; i < RXBUF_SIZE; i++){
+                printk("%d ", rx_chars[i]);
+                if(i % IMGWIDTH == 0)
+                    printk("\n");
+                fflush(stdout);
+            }
+            printk("\n");
+            uart_rxbuf_nchar = 0;
+        }
+        else if(uart_rxbuf_nchar > RXBUF_SIZE){
+            printk("received 2 images between\n");
+            free(image);
+            return NULL;
+        }
+
+        free(image);
+        return NULL;
+            
+        // for(int i = 0; i < IMGWIDTH; i++){
+        //     for(int j = 0; j < IMGWIDTH; j++){
+        //         char c;
+        //         rx_chars[uart_rxbuf_nchar]
+        //         int res = uart_poll_in(uart_dev, &c);
+                
+        //         printk("\n\n\n%d\n\n\n ", c);
+        //         if (res == 0) {
+        //             image[i][j] = (uint8_t)c;
+        //         }
+        //         else{
+        //             printk("Error receiving image\n");
+        //             free(image);
+        //             return NULL;
+        //         }
+        //     }
+        // }
+        return image;
+}
+
+/* UART callback implementation */
+/* Note that callback functions are executed in the scope of interrupt handlers. */
+/* They run asynchronously after hardware/software interrupts and have a higher priority than all threads */
+/* Should be kept as short and simple as possible. Heavier processing should be deferred to a task with suitable priority*/
+static void uart_cb(const struct device *dev, struct uart_event *evt, void *user_data)
+{
+    int err;
+
+    switch (evt->type) {
+	
+        case UART_TX_DONE:
+		    printk("UART_TX_DONE event \n\r");
+            break;
+
+    	case UART_TX_ABORTED:
+	    	printk("UART_TX_ABORTED event \n\r");
+		    break;
+		
+	    case UART_RX_RDY:
+		    printk("UART_RX_RDY event \n\r");
+            /* Just copy data to a buffer. Usually it is preferable to use e.g. a FIFO to communicate with a task that shall process the messages*/
+            memcpy(&rx_chars[uart_rxbuf_nchar],&(rx_buf[evt->data.rx.offset]),evt->data.rx.len); 
+            uart_rxbuf_nchar += evt->data.rx.len; 
+            if(uart_rxbuf_nchar == RXBUF_SIZE){
+                uart_rxbuf_nchar = 0;
+                k_sem_give(&sem_rcvimg);
+            }
+            else if(uart_rxbuf_nchar > RXBUF_SIZE){
+                printk("error \n");
+                uart_rxbuf_nchar = 0;
+            }
+            printk("%d", evt->data.rx.len);   
+
+		    break;
+
+	    case UART_RX_BUF_REQUEST:
+		    printk("UART_RX_BUF_REQUEST event \n\r");
+		    break;
+
+	    case UART_RX_BUF_RELEASED:
+		    printk("UART_RX_BUF_RELEASED event \n\r");
+		    break;
+		
+	    case UART_RX_DISABLED: 
+            /* When the RX_BUFF becomes full RX is is disabled automaticaly.  */
+            /* It must be re-enabled manually for continuous reception */
+            printk("UART_RX_DISABLED event \n\r");
+		    err =  uart_rx_enable(uart_dev ,rx_buf,sizeof(rx_buf),RX_TIMEOUT);
+            if (err) {
+                printk("uart_rx_enable() error. Error code:%d\n\r",err);
+                exit(FATAL_ERR);                
+            }
+		    break;
+
+	    case UART_RX_STOPPED:
+		    printk("UART_RX_STOPPED event \n\r");
+		    break;
+		
+	    default:
+            printk("UART: unknown event \n\r");
+		    break;
+    }
+
 }
 
 
