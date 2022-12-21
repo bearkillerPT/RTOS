@@ -26,7 +26,8 @@ cab *open_cab(char *name, size_t num, uint8_t dim, uint8_t **first)
 
     // allocate the buffersTaken array
     new_cab->buffersTaken = (uint8_t *)calloc(num, sizeof(uint8_t));
-    memset(new_cab->buffersTaken, 0, num);
+    for(size_t i = 0; i < num; i++)
+        new_cab->buffersTaken[i] = 0;
 
     // allocate all buffers
     new_cab->buffers = (uint8_t ***)calloc(num, sizeof(uint8_t **));
@@ -36,9 +37,13 @@ cab *open_cab(char *name, size_t num, uint8_t dim, uint8_t **first)
         for (uint8_t j = 0; j < IMGWIDTH; j++)
             new_cab->buffers[i][j] = (uint8_t *)malloc(IMGWIDTH * sizeof(uint8_t));
     }
-
-    memset(new_cab->buffers, 0, num * IMGWIDTH * IMGWIDTH);
-    memcpy(new_cab->buffers[0], first, IMGWIDTH * IMGWIDTH);
+    for(size_t i = 0; i < num; i++)
+        for(size_t j = 0; j < IMGWIDTH; j++)
+            for(size_t k = 0; k < IMGWIDTH; k++)
+                new_cab->buffers[i][j][k] = 0;
+    for(size_t i = 0; i < IMGWIDTH; i++)
+        for(size_t j = 0; j < IMGWIDTH; j++)
+            new_cab->buffers[0][i][j] = first[i][j];
     new_cab->buffersTaken[0] = 1; // The first will always be taken
     return new_cab;
 }
@@ -66,7 +71,9 @@ void put_mes(uint8_t **buf_pointer, cab *cab_id)
     {
         if (cab_id->buffers[i] == buf_pointer)
         {
-            memcpy(cab_id->buffers[0], cab_id->buffers[i], IMGWIDTH * IMGWIDTH);
+            for(size_t j = 0; j < IMGWIDTH; j++)
+                for(size_t k = 0; k < IMGWIDTH; k++)
+                    cab_id->buffers[0][j][k] = cab_id->buffers[i][j][k];            
             cab_id->buffersTaken[i] = 0;
         }
     }
@@ -81,7 +88,9 @@ uint8_t **get_mes(cab *cab_id)
         if (cab_id->buffersTaken[i] == 0)
         {
             cab_id->buffersTaken[i] = 1;
-            memcpy(cab_id->buffers[i], cab_id->buffers[0], IMGWIDTH * IMGWIDTH);
+            for(size_t j = 0; j < IMGWIDTH; j++)
+                for(size_t k = 0; k < IMGWIDTH; k++)
+                    cab_id->buffers[i][j][k] = cab_id->buffers[0][j][k];
             return cab_id->buffers[i];
         }
     }
