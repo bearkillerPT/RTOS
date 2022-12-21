@@ -129,9 +129,23 @@ int main(int argc, char const *argv[])
     // testing
     cab *cab1;
     cab1 = open_cab("images", 3, IMGWIDTH * IMGWIDTH, img1);
-    printf("cab %s -> num=%ld, dim=%d,  first[0][0][2]=%d\n", cab1->name, cab1->num, cab1->dim, cab1->buffers[0][0][2]);
+    printf("cab %s -> num=%ld, dim=%d\n", cab1->name, cab1->num, cab1->dim);
+
+     
+
+    uint8_t **buffer1 = get_mes(cab1);
+
+    for (size_t i = 0; i < IMGWIDTH; i++)
+    {
+        for (size_t j = 0; j < IMGWIDTH; j++)
+        {
+            printf("%d, ", buffer1[i][j]);
+        }
+        printf("\n");
+    }
 
     uint8_t **free_buffer = reserve(cab1);
+
 
     uint8_t diagonal[5][5] = {{255, 0, 0, 0, 0},
                               {0, 255, 0, 0, 0},
@@ -143,48 +157,25 @@ int main(int argc, char const *argv[])
         for (size_t j = 0; j < IMGWIDTH; j++)
             free_buffer[i][j] = diagonal[i][j];
 
-    put_mes(free_buffer, cab1);
-
-    free_buffer = reserve(cab1);
-
-    uint8_t diagonal2[5][5] = {{0, 0, 0, 0, 255},
-                               {0, 0, 0, 255, 0},
-                               {0, 0, 255, 0, 0},
-                               {0, 255, 0, 0, 0},
-                               {255, 0, 0, 0, 0}};
-
-    for (size_t i = 0; i < IMGWIDTH; i++)
-        for (size_t j = 0; j < IMGWIDTH; j++)
-            free_buffer[i][j] = diagonal2[i][j];
+    
 
     put_mes(free_buffer, cab1);
 
-    for (size_t i = 0; i < IMGWIDTH; i++)
-    {
-        for (size_t j = 0; j < IMGWIDTH; j++)
-        {
-            printf("%d, ", cab1->buffers[0][i][j]);
-        }
-        printf("\n");
-    }
+    uint8_t **buffer2 = get_mes(cab1);
 
     for (size_t i = 0; i < IMGWIDTH; i++)
     {
         for (size_t j = 0; j < IMGWIDTH; j++)
         {
-            printf("%d, ", cab1->buffers[1][i][j]);
+            printf("%d, ", buffer2[i][j]);
         }
         printf("\n");
     }
 
-    for (size_t i = 0; i < IMGWIDTH; i++)
-    {
-        for (size_t j = 0; j < IMGWIDTH; j++)
-        {
-            printf("%d, ", cab1->buffers[2][i][j]);
-        }
-        printf("\n");
-    }
+    unget(buffer1, cab1);
+    unget(buffer2, cab1);
+
+    
 
     return 0;
 }
