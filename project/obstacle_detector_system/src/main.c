@@ -215,6 +215,7 @@ cab* image_cab;
 
 /* image receiver*/
 uint8_t ** receiveImage();
+void* castImage(void* img, uint8_t** image);
 
 // //UART 
 #define FATAL_ERR -1 /* Fatal error return code, app terminates */
@@ -295,7 +296,9 @@ void main(void)
         for (size_t j = 0; j < IMGWIDTH; j++)
             img1[i][j] = vertical_guide_image_data[i][j];
 
-    image_cab = open_cab("image cab", 5, IMGWIDTH*IMGWIDTH, (void *)img1);
+
+    printk("open cab");
+    image_cab = open_cab("image cab", 5, IMGWIDTH*IMGWIDTH, (void*)img1);
 
     k_sem_init(&sem_rcvimg_nearobs, 0, 1);
     k_sem_init(&sem_rcvimg_orientation, 0, 1);
@@ -383,13 +386,24 @@ void thread_near_obstacle_code(void *argA, void *argB, void *argC)
         /* Do the workload */
         k_sem_take(&sem_rcvimg_nearobs, K_FOREVER);
 
-        uint8_t ** image = (uint8_t **)get_mes(image_cab);
+        void* cab_img = get_mes(image_cab);
+        printk("get done\n");
+        fflush(stdout);
+        
+        uint8_t ** image = calloc(IMGWIDTH, sizeof(uint8_t*));
+        for (int i = 0; i < IMGWIDTH; i++)
+            image[i] = calloc(IMGWIDTH, sizeof(uint8_t));
+        castImage(cab_img,image);
+        printk("cast done\n");
+        fflush(stdout);
+        unget(cab_img, image_cab);
+        continue;
 
         printk("Detecting closeby obstacles ...\n");
         int i, j;
         uint8_t res=0;
 
-        for (j = NOB_ROW; j < IMGWIDTH; j++)
+        for (j = NOB_ROW; j < IMGWIDTH*IMGWIDTH; j++)
         {
             int inObs = 0;
             for (i = NOB_COL; i < NOB_COL + NOB_WIDTH; i++)
@@ -407,7 +421,11 @@ void thread_near_obstacle_code(void *argA, void *argB, void *argC)
             }
         }
 
-        unget(image, image_cab);
+        
+        // free image
+        for (i = 0; i < IMGWIDTH; i++)
+            free(image[i]);
+        free(image);
 
 
         nearobs_output = res;
@@ -705,14 +723,14 @@ static void uart_cb(const struct device *dev, struct uart_event *evt, void *user
             uart_rxbuf_nchar += evt->data.rx.len; 
             if(uart_rxbuf_nchar == RXBUF_SIZE){
                 uart_rxbuf_nchar = 0;
-                uint8_t ** img = reserve(image_cab);
+                uint8_t * img = (uint8_t*)reserve(image_cab);
                 for(int i = 0; i < RXBUF_SIZE; i++){
-                    img[i / IMGWIDTH][i % IMGWIDTH] = (uint8_t)rx_chars[i];
+                    img[i] = (uint8_t)rx_chars[i];
                 }
-                put_mes(img, image_cab);
+                put_mes((void*)img, image_cab);
                 k_sem_give(&sem_rcvimg_nearobs);
-                k_sem_give(&sem_rcvimg_orientation);
-                k_sem_give(&sem_rcvimg_obscount);
+                // k_sem_give(&sem_rcvimg_orientation);
+                // k_sem_give(&sem_rcvimg_obscount);
 
             }
             
@@ -748,6 +766,16 @@ static void uart_cb(const struct device *dev, struct uart_event *evt, void *user
 		    break;
     }
 
+}
+
+void* castImage(void* img, uint8_t** image){
+    
+    for(int i = 0; i < IMGWIDTH; i++){
+        for(int j = 0; j < IMGWIDTH; j++){
+            image[i][j] = ((uint8_t*)img)[i*IMGWIDTH + j];
+        }
+    }
+    return image;
 }
 
 

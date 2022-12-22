@@ -5,11 +5,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define IMGWIDTH 5
+#define IMGWIDTH 128
 
 struct cab
 {
-    struct k_sem op_Sem;
+    struct k_sem *op_Sem;
     char *name;
     int num;
     size_t dim;
@@ -21,11 +21,11 @@ struct cab
 cab *open_cab(char *name, int num, size_t dim, void *first)
 {
 
-    cab *new_cab = calloc(sizeof(cab));
+    cab *new_cab = calloc(1, sizeof(cab));
     new_cab->name = name;
     new_cab->num = num;
     new_cab->dim = dim;
-    k_sem_init(&new_cab->op_Sem, 0, 1);
+    k_sem_init(new_cab->op_Sem, 0, 1);
     // allocate the buffersTaken array
     new_cab->buffersTaken = (uint8_t *)calloc(num, sizeof(uint8_t));
     for (size_t i = 0; i < num; i++)
@@ -37,12 +37,8 @@ cab *open_cab(char *name, int num, size_t dim, void *first)
     {
         new_cab->buffers[i] = (void *)calloc(1, dim);
     }
-    for (size_t i = 0; i < num; i++)
-        for (size_t j = 0; j < IMGWIDTH; j++)
-            for (size_t k = 0; k < IMGWIDTH; k++)
-                new_cab->buffers[i][j][k] = 0;
 
-    *new_cab->buffers[0] = *first;
+    new_cab->buffers[0] = first;
     new_cab->buffersTaken[0] = 1; // The first will always be taken
     return new_cab;
 }
@@ -50,18 +46,18 @@ cab *open_cab(char *name, int num, size_t dim, void *first)
 // returns a new buffer
 void *reserve(cab *cab_id)
 {
-    k_sem_take(&cab_id->op_Sem, K_FOREVER);
+    k_sem_take(cab_id->op_Sem, K_FOREVER);
     // find a free buffer
     for (size_t i = 0; i < cab_id->num; i++)
     {
         if (cab_id->buffersTaken[i] == 0)
         {
             cab_id->buffersTaken[i] = 1;
-            k_sem_give(&cab_id->op_Sem);
+            k_sem_give(cab_id->op_Sem);
             return cab_id->buffers[i];
         }
     }
-    k_sem_give(&cab_id->op_Sem);
+    k_sem_give(cab_id->op_Sem);
     return NULL;
 }
 
@@ -69,41 +65,41 @@ void *reserve(cab *cab_id)
 void put_mes(void *buf_pointer, cab *cab_id)
 {
 
-    k_sem_take(&cab_id->op_Sem, K_FOREVER);
+    k_sem_take(cab_id->op_Sem, K_FOREVER);
     for (size_t i = 0; i < cab_id->num; i++)
     {
         if (cab_id->buffers[i] == buf_pointer)
         {
-            *cab_id->buffers[0] = *cab_id->buffers[i];
+            cab_id->buffers[0] = cab_id->buffers[i];
             cab_id->buffersTaken[i] = 0;
         }
     }
-    k_sem_give(&cab_id->op_Sem);
+    k_sem_give(cab_id->op_Sem);
 }
 
 // get latest message
 void *get_mes(cab *cab_id)
 {
-    k_sem_take(&cab_id->op_Sem, K_FOREVER);
+    k_sem_take(cab_id->op_Sem, K_FOREVER);
     // find a free buffer
     for (size_t i = 0; i < cab_id->num; i++)
     {
         if (cab_id->buffersTaken[i] == 0)
         {
             cab_id->buffersTaken[i] = 1;
-            *cab_id->buffers[i] = *cab_id->buffers[0];
-            k_sem_give(&cab_id->op_Sem);
+            cab_id->buffers[i] = cab_id->buffers[0];
+            k_sem_give(cab_id->op_Sem);
             return cab_id->buffers[i];
         }
     }
-    k_sem_give(&cab_id->op_Sem);
+    k_sem_give(cab_id->op_Sem);
     return NULL;
 }
 
 // release message to the CAB
-void unget(uint8_t **mes_pointer, cab *cab_id)
+void unget(void* mes_pointer, cab *cab_id)
 {
-    k_sem_take(&cab_id->op_Sem, K_FOREVER);
+    k_sem_take(cab_id->op_Sem, K_FOREVER);
     for (size_t i = 0; i < cab_id->num; i++)
     {
         if (cab_id->buffers[i] == mes_pointer)
@@ -111,10 +107,10 @@ void unget(uint8_t **mes_pointer, cab *cab_id)
             cab_id->buffersTaken[i] = 0;
         }
     }
-    k_sem_give(&cab_id->op_Sem);
+    k_sem_give(cab_id->op_Sem);
 }
 
-int main(int argc, char const *argv[])
+int test(int argc, char const *argv[])
 {
 
     uint8_t **img1 = (uint8_t **)malloc(IMGWIDTH * sizeof(uint8_t *));

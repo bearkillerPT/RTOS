@@ -4,6 +4,7 @@
 #include "cab.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/printk.h>
 
 #define IMGWIDTH 128
 
@@ -20,16 +21,19 @@ struct cab
 // creates a new cab
 cab *open_cab(char *name, int num, size_t dim, void *first)
 {
-
     cab *new_cab = calloc(1, sizeof(cab));
     new_cab->name = name;
     new_cab->num = num;
     new_cab->dim = dim;
+    new_cab->op_Sem = (struct k_sem*)calloc(1, sizeof(struct k_sem));
+    printk("sem init");
     k_sem_init(new_cab->op_Sem, 0, 1);
+    printk("sem init done");
     // allocate the buffersTaken array
     new_cab->buffersTaken = (uint8_t *)calloc(num, sizeof(uint8_t));
     for (size_t i = 0; i < num; i++)
         new_cab->buffersTaken[i] = 0;
+    printk("allocating buffers");
 
     // allocate all buffers
     new_cab->buffers = (void **)calloc(num, sizeof(void *));
@@ -37,6 +41,7 @@ cab *open_cab(char *name, int num, size_t dim, void *first)
     {
         new_cab->buffers[i] = (void *)calloc(1, dim);
     }
+    printk("copying first");
 
     new_cab->buffers[0] = first;
     new_cab->buffersTaken[0] = 1; // The first will always be taken
@@ -46,7 +51,7 @@ cab *open_cab(char *name, int num, size_t dim, void *first)
 // returns a new buffer
 void *reserve(cab *cab_id)
 {
-    k_sem_take(cab_id->op_Sem, K_FOREVER);
+    k_sem_take(cab_id->op_Sem, K_NO_WAIT);
     // find a free buffer
     for (size_t i = 0; i < cab_id->num; i++)
     {
@@ -65,7 +70,7 @@ void *reserve(cab *cab_id)
 void put_mes(void *buf_pointer, cab *cab_id)
 {
 
-    k_sem_take(cab_id->op_Sem, K_FOREVER);
+    k_sem_take(cab_id->op_Sem, K_NO_WAIT);
     for (size_t i = 0; i < cab_id->num; i++)
     {
         if (cab_id->buffers[i] == buf_pointer)
@@ -80,7 +85,7 @@ void put_mes(void *buf_pointer, cab *cab_id)
 // get latest message
 void *get_mes(cab *cab_id)
 {
-    k_sem_take(cab_id->op_Sem, K_FOREVER);
+    k_sem_take(cab_id->op_Sem, K_NO_WAIT);
     // find a free buffer
     for (size_t i = 0; i < cab_id->num; i++)
     {
@@ -99,7 +104,7 @@ void *get_mes(cab *cab_id)
 // release message to the CAB
 void unget(void* mes_pointer, cab *cab_id)
 {
-    k_sem_take(cab_id->op_Sem, K_FOREVER);
+    k_sem_take(cab_id->op_Sem, K_NO_WAIT);
     for (size_t i = 0; i < cab_id->num; i++)
     {
         if (cab_id->buffers[i] == mes_pointer)
