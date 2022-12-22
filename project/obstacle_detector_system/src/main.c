@@ -295,7 +295,7 @@ void main(void)
         for (size_t j = 0; j < IMGWIDTH; j++)
             img1[i][j] = vertical_guide_image_data[i][j];
 
-    image_cab = open_cab("image cab", 5, IMGWIDTH*IMGWIDTH, img1);
+    image_cab = open_cab("image cab", 5, IMGWIDTH*IMGWIDTH, (void *)img1);
 
     k_sem_init(&sem_rcvimg_nearobs, 0, 1);
     k_sem_init(&sem_rcvimg_orientation, 0, 1);
@@ -383,7 +383,7 @@ void thread_near_obstacle_code(void *argA, void *argB, void *argC)
         /* Do the workload */
         k_sem_take(&sem_rcvimg_nearobs, K_FOREVER);
 
-        uint8_t ** image = get_mes(image_cab);
+        uint8_t ** image = (uint8_t **)get_mes(image_cab);
 
         printk("Detecting closeby obstacles ...\n");
         int i, j;
@@ -445,7 +445,7 @@ void thread_orientation_code(void *argA, void *argB, void *argC)
         /* Do the workload */
         k_sem_take(&sem_rcvimg_orientation, K_FOREVER);
 
-        uint8_t ** image = get_mes(image_cab);
+        uint8_t ** image = (uint8_t **)get_mes(image_cab);
 
         printk("Detecting position and guideline angle...\n");
         int i, gf_pos;
@@ -579,7 +579,7 @@ void thread_obscount_code(void *argA, void *argB, void *argC)
         /* Do the workload */
         k_sem_take(&sem_rcvimg_obscount, K_FOREVER);
     
-        uint8_t ** image = get_mes(image_cab);
+        uint8_t ** image = (uint8_t **)get_mes(image_cab);
 
 	    printk("Detecting number of obstacles ...\n");
         int i, j, nobs;
