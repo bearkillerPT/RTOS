@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define IMGWIDTH 5
+#define IMGWIDTH 128
 
 struct cab
 {
@@ -18,8 +18,7 @@ struct cab
 // creates a new cab
 cab *open_cab(char *name, size_t num, uint8_t dim, uint8_t **first)
 {
-
-    cab *new_cab = malloc(sizeof(cab));
+    cab *new_cab = calloc(1, sizeof(cab));
     new_cab->name = name;
     new_cab->num = num;
     new_cab->dim = dim;
@@ -33,9 +32,9 @@ cab *open_cab(char *name, size_t num, uint8_t dim, uint8_t **first)
     new_cab->buffers = (uint8_t ***)calloc(num, sizeof(uint8_t **));
     for (size_t i = 0; i < num; i++)
     {
-        new_cab->buffers[i] = (uint8_t **)malloc(IMGWIDTH * sizeof(uint8_t *));
+        new_cab->buffers[i] = (uint8_t **)calloc(IMGWIDTH, sizeof(uint8_t *));
         for (uint8_t j = 0; j < IMGWIDTH; j++)
-            new_cab->buffers[i][j] = (uint8_t *)malloc(IMGWIDTH * sizeof(uint8_t));
+            new_cab->buffers[i][j] = (uint8_t *)calloc(IMGWIDTH, sizeof(uint8_t));
     }
     for(size_t i = 0; i < num; i++)
         for(size_t j = 0; j < IMGWIDTH; j++)
@@ -109,7 +108,7 @@ void unget(uint8_t **mes_pointer, cab *cab_id)
     }
 }
 
-int main(int argc, char const *argv[])
+int test_cab(int argc, char const *argv[])
 {
 
     uint8_t **img1 = (uint8_t **)malloc(IMGWIDTH * sizeof(uint8_t *));

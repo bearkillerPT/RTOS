@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
-// #include "cab.h"
+#include "cab.h"
 
 
 // Image constants
@@ -165,7 +165,6 @@ uint8_t vertical_guide_image_data[IMGWIDTH][IMGWIDTH] =
 #define SAMP_PERIOD_MS 1000
 
 /* Semaphores for task sync */
-struct k_sem sem_rcvimg;
 struct k_sem sem_rcvimg_nearobs;
 struct k_sem sem_rcvimg_orientation;
 struct k_sem sem_rcvimg_obscount;
@@ -210,6 +209,9 @@ k_tid_t thread_near_obstacle_tid;
 k_tid_t thread_orientation_tid;
 k_tid_t thread_output_tid;
 k_tid_t thread_obscount_tid;
+
+/* Cab */
+cab* image_cab;
 
 /* image receiver*/
 uint8_t ** receiveImage();
@@ -283,16 +285,25 @@ void main(void)
         return;
     }
 
+    /* Initialize cab */
+    
+    uint8_t **img1 = (uint8_t **)malloc(IMGWIDTH * sizeof(uint8_t *));
+    for (uint8_t j = 0; j < IMGWIDTH; j++)
+        img1[j] = (uint8_t *)malloc(IMGWIDTH * sizeof(uint8_t));
 
+    for (size_t i = 0; i < IMGWIDTH; i++)
+        for (size_t j = 0; j < IMGWIDTH; j++)
+            img1[i][j] = vertical_guide_image_data[i][j];
 
+    image_cab = open_cab("image cab", 5, IMGWIDTH*IMGWIDTH, img1);
 
-    k_sem_init(&sem_rcvimg, 0, 1);
     k_sem_init(&sem_rcvimg_nearobs, 0, 1);
     k_sem_init(&sem_rcvimg_orientation, 0, 1);
     k_sem_init(&sem_nearobs_output, 0, 1);
     k_sem_init(&sem_orientation_output, 0, 1);
     k_sem_init(&sem_rcvimg_obscount, 0, 1);
     k_sem_init(&sem_obscount_output, 0, 1);
+    
     
     
     /* Create tasks */
@@ -330,15 +341,10 @@ void thread_receive_image_code(void *argA, void *argB, void *argC)
     while (1)
     {
         /* Code for receiving image */
-        k_sem_take(&sem_rcvimg, K_FOREVER);
         
         receiveImage();
 
         /*--------------------------*/
-
-        // k_sem_give(&sem_rcvimg_nearobs);
-        // k_sem_give(&sem_rcvimg_orientation);
-        // k_sem_give(&sem_rcvimg_obscount);
         
 
         /* Wait for next release instant */
@@ -353,6 +359,11 @@ void thread_receive_image_code(void *argA, void *argB, void *argC)
 
         printk("Task %s arrived at %lld inter-arrival time (us): min: %lld / max: %lld \n\r", "rcv img", (long long)k_uptime_get(), t_min, t_max);
 
+        if (fin_time < release_time)
+        {
+            k_msleep(release_time - fin_time);
+            release_time += SAMP_PERIOD_MS;
+        }
         
     }
 }
@@ -372,16 +383,18 @@ void thread_near_obstacle_code(void *argA, void *argB, void *argC)
         /* Do the workload */
         k_sem_take(&sem_rcvimg_nearobs, K_FOREVER);
 
+        uint8_t ** image = get_mes(image_cab);
+
         printk("Detecting closeby obstacles ...\n");
         int i, j;
         uint8_t res=0;
 
-        for (j = 0; j < NOB_ROW; j++)
+        for (j = NOB_ROW; j < IMGWIDTH; j++)
         {
             int inObs = 0;
-            for (i = NOB_COL; i < NOB_COL * 3; i++)
+            for (i = NOB_COL; i < NOB_COL + NOB_WIDTH; i++)
             {
-                if (vertical_guide_image_data[j][i] == OBSTACLE_COLOR)
+                if (image[j][i] == OBSTACLE_COLOR)
                 {
                     inObs++;
                 }
@@ -393,6 +406,8 @@ void thread_near_obstacle_code(void *argA, void *argB, void *argC)
                     res=1;
             }
         }
+
+        unget(image, image_cab);
 
 
         nearobs_output = res;
@@ -430,6 +445,8 @@ void thread_orientation_code(void *argA, void *argB, void *argC)
         /* Do the workload */
         k_sem_take(&sem_rcvimg_orientation, K_FOREVER);
 
+        uint8_t ** image = get_mes(image_cab);
+
         printk("Detecting position and guideline angle...\n");
         int i, gf_pos;
 
@@ -440,7 +457,7 @@ void thread_orientation_code(void *argA, void *argB, void *argC)
         /* Search for guideline pos - Near*/
         for (i = 0; i < IMGWIDTH; i++)
         {
-            if (vertical_guide_image_data[GN_ROW][i] == GUIDELINE_COLOR)
+            if (image[GN_ROW][i] == GUIDELINE_COLOR)
             {
                 pos = i;
                 break;
@@ -450,7 +467,7 @@ void thread_orientation_code(void *argA, void *argB, void *argC)
         // /* Search for guideline pos - Far*/
         for (i = 0; i < IMGWIDTH; i++)
         {
-            if (vertical_guide_image_data[GF_ROW][i] == GUIDELINE_COLOR)
+            if (image[GF_ROW][i] == GUIDELINE_COLOR)
             {
                 gf_pos = i;
                 break;
@@ -476,13 +493,15 @@ void thread_orientation_code(void *argA, void *argB, void *argC)
             else
                 pos_delta--;
             angle = acos(IMGWIDTH / sqrt(pow(IMGWIDTH, 2) + pow(pos_delta, 2)));
-            if (pos_delta < 0)
+            if (pos_delta > 0)
                 angle = -angle;
         }
 
         // write data on shared memory
         itoa(pos, orientation_output[0], 10);
         gcvt (angle, 6, orientation_output[1]);
+
+        unget(image, image_cab);
         
         k_sem_give(&sem_orientation_output);
 
@@ -516,14 +535,18 @@ void thread_output_code(void *argA, void *argB, void *argC)
     while (1)
     {
         /* Do the workload */
-        k_sem_take(&sem_nearobs_output, K_FOREVER);
-        printk("\tCloseby obstacles detected: %s\n\r", nearobs_output==1? "Yes" : "No");
+        int s1,s2,s3;
+        s1 = k_sem_take(&sem_nearobs_output, K_FOREVER);
+        if(s1 == 0)
+            printk("\tCloseby obstacles detected: %s\n\r", nearobs_output==1? "Yes" : "No");
         
-        k_sem_take(&sem_orientation_output, K_FOREVER);
-        printk("\tRobot position=%s, guideline angle=%s\n\r", orientation_output[0], orientation_output[1]);
+        s2 = k_sem_take(&sem_orientation_output, K_FOREVER);
+        if(s2 == 0)
+            printk("\tRobot position=%s, guideline angle=%s\n\r", orientation_output[0], orientation_output[1]);
 
-        k_sem_take(&sem_obscount_output, K_FOREVER);
-	    printk("\t%d obstacles detected\n\r", obscount_output);
+        s3 = k_sem_take(&sem_obscount_output, K_FOREVER);
+        if(s3 == 0)
+	        printk("\t%d obstacles detected\n\r", obscount_output);
         
         /* Wait for next release instant */
         fin_time = k_uptime_get();
@@ -555,6 +578,8 @@ void thread_obscount_code(void *argA, void *argB, void *argC)
     {
         /* Do the workload */
         k_sem_take(&sem_rcvimg_obscount, K_FOREVER);
+    
+        uint8_t ** image = get_mes(image_cab);
 
 	    printk("Detecting number of obstacles ...\n");
         int i, j, nobs;
@@ -568,7 +593,7 @@ void thread_obscount_code(void *argA, void *argB, void *argC)
             int inObs = 0;
             for (i = 0; i < IMGWIDTH; i++)
             {
-                if (vertical_guide_image_data[j][i] == OBSTACLE_COLOR)
+                if (image[j][i] == OBSTACLE_COLOR)
                 {
                     inObs++;
                 }
@@ -583,6 +608,8 @@ void thread_obscount_code(void *argA, void *argB, void *argC)
         }
 
         obscount_output = nobs;
+
+        unget(image, image_cab);
         k_sem_give(&sem_obscount_output);
         
         /* Wait for next release instant */
@@ -668,16 +695,27 @@ static void uart_cb(const struct device *dev, struct uart_event *evt, void *user
 	    case UART_RX_RDY:
 		    printk("UART_RX_RDY event \n\r");
             /* Just copy data to a buffer. Usually it is preferable to use e.g. a FIFO to communicate with a task that shall process the messages*/
+            printk("Received %d bytes. nchar= %d, %d\n", evt->data.rx.len, uart_rxbuf_nchar, evt->data.rx.offset);
+            if(uart_rxbuf_nchar + evt->data.rx.len > RXBUF_SIZE){
+                printk("Error. Received more data than expected for %d x %d \n", IMGWIDTH, IMGWIDTH);
+                uart_rxbuf_nchar = 0;
+                break;
+            }
             memcpy(&rx_chars[uart_rxbuf_nchar],&(rx_buf[evt->data.rx.offset]),evt->data.rx.len); 
             uart_rxbuf_nchar += evt->data.rx.len; 
             if(uart_rxbuf_nchar == RXBUF_SIZE){
                 uart_rxbuf_nchar = 0;
-                k_sem_give(&sem_rcvimg);
+                uint8_t ** img = reserve(image_cab);
+                for(int i = 0; i < RXBUF_SIZE; i++){
+                    img[i / IMGWIDTH][i % IMGWIDTH] = (uint8_t)rx_chars[i];
+                }
+                put_mes(img, image_cab);
+                k_sem_give(&sem_rcvimg_nearobs);
+                k_sem_give(&sem_rcvimg_orientation);
+                k_sem_give(&sem_rcvimg_obscount);
+
             }
-            else if(uart_rxbuf_nchar > RXBUF_SIZE){
-                printk("error \n");
-                uart_rxbuf_nchar = 0;
-            }
+            
             printk("%d", evt->data.rx.len);   
 
 		    break;
