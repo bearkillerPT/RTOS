@@ -213,8 +213,6 @@ k_tid_t thread_obscount_tid;
 /* Cab */
 cab* image_cab;
 
-/* image receiver*/
-uint8_t ** receiveImage();
 uint8_t** castImage(uint8_t* img);
 
 // //UART 
@@ -344,8 +342,21 @@ void thread_receive_image_code(void *argA, void *argB, void *argC)
     while (1)
     {
         /* Code for receiving image */
-        
-        receiveImage();
+
+        if(uart_rxbuf_nchar == RXBUF_SIZE){
+                uart_rxbuf_nchar = 0;
+                uint8_t * img = (uint8_t*)reserve(image_cab);
+
+                for(int i = 0; i < RXBUF_SIZE; i++){
+                    img[i] = (uint8_t)rx_chars[i];
+                }
+                
+                put_mes((void*)img, image_cab);
+                k_sem_give(&sem_rcvimg_nearobs);
+                k_sem_give(&sem_rcvimg_orientation);
+                k_sem_give(&sem_rcvimg_obscount);
+
+        }
 
         /*--------------------------*/
         
@@ -388,19 +399,13 @@ void thread_near_obstacle_code(void *argA, void *argB, void *argC)
 
         uint8_t* cab_img = (uint8_t*)get_mes(image_cab);
         
-        printk("get done\n");
-        fflush(stdout);
         uint8_t ** image = castImage(cab_img);
-        printk("cast done\n");
-        fflush(stdout);
         unget((void*)cab_img, image_cab);
-        continue;
 
-        printk("Detecting closeby obstacles ...\n");
         int i, j;
         uint8_t res=0;
 
-        for (j = NOB_ROW; j < IMGWIDTH*IMGWIDTH; j++)
+        for (j = NOB_ROW; j < IMGWIDTH; j++)
         {
             int inObs = 0;
             for (i = NOB_COL; i < NOB_COL + NOB_WIDTH; i++)
@@ -460,7 +465,10 @@ void thread_orientation_code(void *argA, void *argB, void *argC)
         /* Do the workload */
         k_sem_take(&sem_rcvimg_orientation, K_FOREVER);
 
-        uint8_t ** image = (uint8_t **)get_mes(image_cab);
+        uint8_t* cab_img = (uint8_t*)get_mes(image_cab);
+        
+        uint8_t ** image = castImage(cab_img);
+        unget((void*)cab_img, image_cab);
 
         printk("Detecting position and guideline angle...\n");
         int i, gf_pos;
@@ -516,8 +524,6 @@ void thread_orientation_code(void *argA, void *argB, void *argC)
         itoa(pos, orientation_output[0], 10);
         gcvt (angle, 6, orientation_output[1]);
 
-        unget(image, image_cab);
-        
         k_sem_give(&sem_orientation_output);
 
         
@@ -593,9 +599,12 @@ void thread_obscount_code(void *argA, void *argB, void *argC)
     {
         /* Do the workload */
         k_sem_take(&sem_rcvimg_obscount, K_FOREVER);
-    
-        uint8_t ** image = (uint8_t **)get_mes(image_cab);
 
+        uint8_t* cab_img = (uint8_t*)get_mes(image_cab);
+        
+        uint8_t ** image = castImage(cab_img);
+        unget((void*)cab_img, image_cab);
+    
 	    printk("Detecting number of obstacles ...\n");
         int i, j, nobs;
 
@@ -624,7 +633,6 @@ void thread_obscount_code(void *argA, void *argB, void *argC)
 
         obscount_output = nobs;
 
-        unget(image, image_cab);
         k_sem_give(&sem_obscount_output);
         
         /* Wait for next release instant */
@@ -643,51 +651,6 @@ void thread_obscount_code(void *argA, void *argB, void *argC)
     }
 }
 
-uint8_t ** receiveImage(){
-        
-        uint8_t ** image = (uint8_t **) malloc(IMGWIDTH * sizeof(uint8_t *));
-        for (int i = 0; i < IMGWIDTH; i++)
-            image[i] = (uint8_t *) malloc(IMGWIDTH * sizeof(uint8_t));
-
-        printk("%d\n", uart_rxbuf_nchar);
-        if(uart_rxbuf_nchar == RXBUF_SIZE){
-            for(int i = 0; i < RXBUF_SIZE; i++){
-                printk("%d ", rx_chars[i]);
-                if(i % IMGWIDTH == 0)
-                    printk("\n");
-                fflush(stdout);
-            }
-            printk("\n");
-            uart_rxbuf_nchar = 0;
-        }
-        else if(uart_rxbuf_nchar > RXBUF_SIZE){
-            printk("received 2 images between\n");
-            free(image);
-            return NULL;
-        }
-
-        free(image);
-        return NULL;
-            
-        // for(int i = 0; i < IMGWIDTH; i++){
-        //     for(int j = 0; j < IMGWIDTH; j++){
-        //         char c;
-        //         rx_chars[uart_rxbuf_nchar]
-        //         int res = uart_poll_in(uart_dev, &c);
-                
-        //         printk("\n\n\n%d\n\n\n ", c);
-        //         if (res == 0) {
-        //             image[i][j] = (uint8_t)c;
-        //         }
-        //         else{
-        //             printk("Error receiving image\n");
-        //             free(image);
-        //             return NULL;
-        //         }
-        //     }
-        // }
-        return image;
-}
 
 /* UART callback implementation */
 /* Note that callback functions are executed in the scope of interrupt handlers. */
@@ -718,20 +681,7 @@ static void uart_cb(const struct device *dev, struct uart_event *evt, void *user
             }
             memcpy(&rx_chars[uart_rxbuf_nchar],&(rx_buf[evt->data.rx.offset]),evt->data.rx.len); 
             uart_rxbuf_nchar += evt->data.rx.len; 
-            if(uart_rxbuf_nchar == RXBUF_SIZE){
-                uart_rxbuf_nchar = 0;
-                
-                uint8_t * img = (uint8_t*)reserve(image_cab);
-                for(int i = 0; i < RXBUF_SIZE; i++){
-                    img[i] = (uint8_t)rx_chars[i];
-                }
-                
-                put_mes((void*)img, image_cab);
-                k_sem_give(&sem_rcvimg_nearobs);
-                // k_sem_give(&sem_rcvimg_orientation);
-                // k_sem_give(&sem_rcvimg_obscount);
-
-            }
+            
             
             printk("%d", evt->data.rx.len);   
 
@@ -768,10 +718,11 @@ static void uart_cb(const struct device *dev, struct uart_event *evt, void *user
 }
 
 uint8_t** castImage(uint8_t* img){
-    uint8_t** image = (uint8_t**)calloc(IMGWIDTH, sizeof(uint8_t*));
+    uint8_t** image = (uint8_t**)malloc(IMGWIDTH * sizeof(uint8_t*));
     for(int i = 0; i < IMGWIDTH; i++){
-        image[i] = (uint8_t*)calloc(IMGWIDTH, sizeof(uint8_t));
+        image[i] = (uint8_t*)malloc(IMGWIDTH * sizeof(uint8_t));
     } 
+
     for(int i = 0; i < IMGWIDTH; i++){
         for(int j = 0; j < IMGWIDTH; j++){
             image[i][j] = img[i*IMGWIDTH + j];
