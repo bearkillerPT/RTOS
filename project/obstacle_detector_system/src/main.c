@@ -215,7 +215,7 @@ cab* image_cab;
 
 /* image receiver*/
 uint8_t ** receiveImage();
-void* castImage(void* img, uint8_t** image);
+uint8_t** castImage(uint8_t* img);
 
 // //UART 
 #define FATAL_ERR -1 /* Fatal error return code, app terminates */
@@ -386,17 +386,14 @@ void thread_near_obstacle_code(void *argA, void *argB, void *argC)
         /* Do the workload */
         k_sem_take(&sem_rcvimg_nearobs, K_FOREVER);
 
-        void* cab_img = get_mes(image_cab);
+        uint8_t* cab_img = (uint8_t*)get_mes(image_cab);
+        
         printk("get done\n");
         fflush(stdout);
-        
-        uint8_t ** image = calloc(IMGWIDTH, sizeof(uint8_t*));
-        for (int i = 0; i < IMGWIDTH; i++)
-            image[i] = calloc(IMGWIDTH, sizeof(uint8_t));
-        castImage(cab_img,image);
+        uint8_t ** image = castImage(cab_img);
         printk("cast done\n");
         fflush(stdout);
-        unget(cab_img, image_cab);
+        unget((void*)cab_img, image_cab);
         continue;
 
         printk("Detecting closeby obstacles ...\n");
@@ -723,10 +720,12 @@ static void uart_cb(const struct device *dev, struct uart_event *evt, void *user
             uart_rxbuf_nchar += evt->data.rx.len; 
             if(uart_rxbuf_nchar == RXBUF_SIZE){
                 uart_rxbuf_nchar = 0;
+                
                 uint8_t * img = (uint8_t*)reserve(image_cab);
                 for(int i = 0; i < RXBUF_SIZE; i++){
                     img[i] = (uint8_t)rx_chars[i];
                 }
+                
                 put_mes((void*)img, image_cab);
                 k_sem_give(&sem_rcvimg_nearobs);
                 // k_sem_give(&sem_rcvimg_orientation);
@@ -768,11 +767,14 @@ static void uart_cb(const struct device *dev, struct uart_event *evt, void *user
 
 }
 
-void* castImage(void* img, uint8_t** image){
-    
+uint8_t** castImage(uint8_t* img){
+    uint8_t** image = (uint8_t**)calloc(IMGWIDTH, sizeof(uint8_t*));
+    for(int i = 0; i < IMGWIDTH; i++){
+        image[i] = (uint8_t*)calloc(IMGWIDTH, sizeof(uint8_t));
+    } 
     for(int i = 0; i < IMGWIDTH; i++){
         for(int j = 0; j < IMGWIDTH; j++){
-            image[i][j] = ((uint8_t*)img)[i*IMGWIDTH + j];
+            image[i][j] = img[i*IMGWIDTH + j];
         }
     }
     return image;

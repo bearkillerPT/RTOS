@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/printk.h>
+#include <string.h> 
 
 #define IMGWIDTH 128
 
@@ -43,7 +44,7 @@ cab *open_cab(char *name, int num, size_t dim, void *first)
     }
     printk("copying first");
 
-    new_cab->buffers[0] = first;
+    memcpy(new_cab->buffers[0], first, dim);
     new_cab->buffersTaken[0] = 1; // The first will always be taken
     return new_cab;
 }
@@ -75,7 +76,7 @@ void put_mes(void *buf_pointer, cab *cab_id)
     {
         if (cab_id->buffers[i] == buf_pointer)
         {
-            cab_id->buffers[0] = cab_id->buffers[i];
+            memcpy(cab_id->buffers[0], cab_id->buffers[i], cab_id->dim);
             cab_id->buffersTaken[i] = 0;
         }
     }
@@ -85,14 +86,14 @@ void put_mes(void *buf_pointer, cab *cab_id)
 // get latest message
 void *get_mes(cab *cab_id)
 {
-    k_sem_take(cab_id->op_Sem, K_NO_WAIT);
+    printk("semaforo->%d\n", k_sem_take(cab_id->op_Sem, K_NO_WAIT));
     // find a free buffer
     for (size_t i = 0; i < cab_id->num; i++)
     {
         if (cab_id->buffersTaken[i] == 0)
         {
             cab_id->buffersTaken[i] = 1;
-            cab_id->buffers[i] = cab_id->buffers[0];
+            memcpy(cab_id->buffers[i], cab_id->buffers[0], cab_id->dim);
             k_sem_give(cab_id->op_Sem);
             return cab_id->buffers[i];
         }
