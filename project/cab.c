@@ -6,6 +6,8 @@
 #include <string.h>
 #define IMGWIDTH 128
 
+uint8_t** castImage(uint8_t* img);
+
 struct cab
 {
     char *name;
@@ -243,13 +245,13 @@ int main(int argc, char const *argv[])
     cab1 = open_cab("images", 3, IMGWIDTH * IMGWIDTH, (void*)buffer);
     printf("cab %s -> num=%ld, dim=%d\n", cab1->name, cab1->num, cab1->dim);
 
-    uint8_t *buffer1 = (uint8_t *)get_mes(cab1);
+    uint8_t **buffer1 = castImage((uint8_t *)get_mes(cab1));
     for (size_t i = 0; i < IMGWIDTH; i++)
     {
         for (size_t j = 0; j < IMGWIDTH; j++)
         {
-            if(buffer1[i*IMGWIDTH+ j] != left_45_guide_image_data[i][j])
-            printf("%d differs from %d, ", buffer1[i*IMGWIDTH+ j], left_45_guide_image_data[i][j]);
+            if(buffer1[i][j] != left_45_guide_image_data[i][j])
+            printf("%d differs from %d, ", buffer1[i][j], left_45_guide_image_data[i][j]);
         }
     }
 
@@ -279,4 +281,18 @@ int main(int argc, char const *argv[])
     unget((void *)buffer2, cab1);
 
     return 0;
+}
+
+uint8_t** castImage(uint8_t* img)
+{
+    uint8_t** image = (uint8_t**)calloc(IMGWIDTH, sizeof(uint8_t*));
+    for(int i = 0; i < IMGWIDTH; i++){
+        image[i] = (uint8_t*)calloc(IMGWIDTH, sizeof(uint8_t));
+    } 
+    for(int i = 0; i < IMGWIDTH; i++){
+        for(int j = 0; j < IMGWIDTH; j++){
+            image[i][j] = img[i*IMGWIDTH + j];
+        }
+    }
+    return image;
 }
