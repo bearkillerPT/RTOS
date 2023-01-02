@@ -113,7 +113,12 @@ int main()
       printf("Sent %i bytes", bytes_written);
 
     fflush(stdout);
-    exit(9);
+    //wait 5s
+    sleep(5);
+
+    //free memory
+    free(imageBuffer);
+    free(filename);
   }
 
 

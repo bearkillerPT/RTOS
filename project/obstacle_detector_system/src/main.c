@@ -165,13 +165,16 @@ uint8_t vertical_guide_image_data[IMGWIDTH][IMGWIDTH] =
 #define SAMP_PERIOD_MS 1000
 
 /* Semaphores for task sync */
+struct k_sem sem_rcvimg;
 struct k_sem sem_rcvimg_nearobs;
 struct k_sem sem_rcvimg_orientation;
 struct k_sem sem_rcvimg_obscount;
-struct k_sem sem_nearobs_output;
-struct k_sem sem_orientation_output;
-struct k_sem sem_obscount_output;
+struct k_sem sem_tasks_output;
 
+/* irq keys*/
+unsigned int key1;
+unsigned int key2;
+unsigned int key3;
 
 
 /* Global vars (shared memory between tasks) */
@@ -300,10 +303,10 @@ void main(void)
 
     k_sem_init(&sem_rcvimg_nearobs, 0, 1);
     k_sem_init(&sem_rcvimg_orientation, 0, 1);
-    k_sem_init(&sem_nearobs_output, 0, 1);
-    k_sem_init(&sem_orientation_output, 0, 1);
+    k_sem_init(&sem_tasks_output, 0, 1);
     k_sem_init(&sem_rcvimg_obscount, 0, 1);
-    k_sem_init(&sem_obscount_output, 0, 1);
+    k_sem_init(&sem_rcvimg, 0, 1);
+    
     
     
     
@@ -323,6 +326,7 @@ void main(void)
     thread_obscount_tid = k_thread_create(&thread_obscount_data, thread_obscount_stack,
                                                K_THREAD_STACK_SIZEOF(thread_obscount_stack), thread_obscount_code,
                                                NULL, NULL, NULL, thread_obscount_prio, 0, K_NO_WAIT);
+                                            
 
     return;
 }
@@ -333,7 +337,7 @@ void thread_receive_image_code(void *argA, void *argB, void *argC)
 {
     int64_t release_time=0, fin_time=0, t_prev = 0, t_min = SAMP_PERIOD_MS, t_max = SAMP_PERIOD_MS;
 
-    printk("Thread receive_image init (periodic)\n");
+    printk("Thread receive_image init\n");
 
     /* Compute next release instant */
     release_time = k_uptime_get() + SAMP_PERIOD_MS;
@@ -341,23 +345,23 @@ void thread_receive_image_code(void *argA, void *argB, void *argC)
     /* Thread loop */
     while (1)
     {
+        k_sem_take(&sem_rcvimg, K_FOREVER);
+        printk("$Receive image -> %lld\n", (long long) k_uptime_get());
+
         /* Code for receiving image */
+        
+        uint8_t * img = (uint8_t*)reserve(image_cab);
 
-        if(uart_rxbuf_nchar == RXBUF_SIZE){
-                uart_rxbuf_nchar = 0;
-                uint8_t * img = (uint8_t*)reserve(image_cab);
-
-                for(int i = 0; i < RXBUF_SIZE; i++){
-                    img[i] = (uint8_t)rx_chars[i];
-                }
-                
-                put_mes((void*)img, image_cab);
-                k_sem_give(&sem_rcvimg_nearobs);
-                k_sem_give(&sem_rcvimg_orientation);
-                k_sem_give(&sem_rcvimg_obscount);
-
+        for(int i = 0; i < RXBUF_SIZE; i++){
+            img[i] = (uint8_t)rx_chars[i];
         }
-
+        
+        put_mes((void*)img, image_cab);
+        k_sem_give(&sem_rcvimg_nearobs);
+        k_sem_give(&sem_rcvimg_orientation);
+        k_sem_give(&sem_rcvimg_obscount);
+ 
+        
         /*--------------------------*/
         
 
@@ -371,13 +375,7 @@ void thread_receive_image_code(void *argA, void *argB, void *argC)
             
         t_prev = fin_time;
 
-        printk("Task %s arrived at %lld inter-arrival time (us): min: %lld / max: %lld \n\r", "rcv img", (long long)k_uptime_get(), t_min, t_max);
-
-        if (fin_time < release_time)
-        {
-            k_msleep(release_time - fin_time);
-            release_time += SAMP_PERIOD_MS;
-        }
+        // printk("Task %s arrived at %lld inter-arrival time (us): min: %lld / max: %lld \n\r", "rcv img", (long long)k_uptime_get(), t_min, t_max);
         
     }
 }
@@ -394,8 +392,12 @@ void thread_near_obstacle_code(void *argA, void *argB, void *argC)
     /* Thread loop */
     while (1)
     {
+        printk("$Receive image -> %lld\n", (long long) k_uptime_get());
+
         /* Do the workload */
         k_sem_take(&sem_rcvimg_nearobs, K_FOREVER);
+
+        printk("Detecting nearby obstacles...\n");
 
         uint8_t* cab_img = (uint8_t*)get_mes(image_cab);
         
@@ -431,7 +433,7 @@ void thread_near_obstacle_code(void *argA, void *argB, void *argC)
 
 
         nearobs_output = res;
-        k_sem_give(&sem_nearobs_output);
+        k_sem_give(&sem_tasks_output);
         
         /* Wait for next release instant */
         fin_time = k_uptime_get();
@@ -443,8 +445,9 @@ void thread_near_obstacle_code(void *argA, void *argB, void *argC)
             
         t_prev = fin_time;
 
-        // printk("Task %s arrived at %lld inter-arrival time (us): min: %lld / max: %lld \n\r", "near obstacle", (long long)k_uptime_get(), t_min, t_max);
+        irq_unlock(key1);
 
+        printk("$Near obs -> %lld\n", (long long) k_uptime_get());
         
     }
 }
@@ -524,7 +527,14 @@ void thread_orientation_code(void *argA, void *argB, void *argC)
         itoa(pos, orientation_output[0], 10);
         gcvt (angle, 6, orientation_output[1]);
 
-        k_sem_give(&sem_orientation_output);
+        //free image
+        for (i = 0; i < IMGWIDTH; i++)
+        {
+            free(image[i]);
+        }
+        free(image);
+
+        k_sem_give(&sem_tasks_output);
 
         
         
@@ -538,7 +548,9 @@ void thread_orientation_code(void *argA, void *argB, void *argC)
             
         t_prev = fin_time;
 
-        // printk("Task %s arrived at %lld inter-arrival time (us): min: %lld / max: %lld \n\r", "near obstacle", (long long)k_uptime_get(), t_min, t_max);
+        irq_unlock(key2);
+
+        printk("$orientation -> %lld\n", (long long) k_uptime_get());
 
         
     }
@@ -556,18 +568,13 @@ void thread_output_code(void *argA, void *argB, void *argC)
     while (1)
     {
         /* Do the workload */
-        int s1,s2,s3;
-        s1 = k_sem_take(&sem_nearobs_output, K_FOREVER);
-        if(s1 == 0)
-            printk("\tCloseby obstacles detected: %s\n\r", nearobs_output==1? "Yes" : "No");
+        k_sem_take(&sem_tasks_output, K_FOREVER);
         
-        s2 = k_sem_take(&sem_orientation_output, K_FOREVER);
-        if(s2 == 0)
-            printk("\tRobot position=%s, guideline angle=%s\n\r", orientation_output[0], orientation_output[1]);
+        printk("\tCloseby obstacles detected: %s\n\r", nearobs_output==1? "Yes" : "No");
+        
+        printk("\tRobot position=%s, guideline angle=%s\n\r", orientation_output[0], orientation_output[1]);
 
-        s3 = k_sem_take(&sem_obscount_output, K_FOREVER);
-        if(s3 == 0)
-	        printk("\t%d obstacles detected\n\r", obscount_output);
+        printk("\t%d obstacles detected\n\r", obscount_output);
         
         /* Wait for next release instant */
         fin_time = k_uptime_get();
@@ -601,8 +608,8 @@ void thread_obscount_code(void *argA, void *argB, void *argC)
         k_sem_take(&sem_rcvimg_obscount, K_FOREVER);
 
         uint8_t* cab_img = (uint8_t*)get_mes(image_cab);
-        
         uint8_t ** image = castImage(cab_img);
+
         unget((void*)cab_img, image_cab);
     
 	    printk("Detecting number of obstacles ...\n");
@@ -633,7 +640,14 @@ void thread_obscount_code(void *argA, void *argB, void *argC)
 
         obscount_output = nobs;
 
-        k_sem_give(&sem_obscount_output);
+        //free image
+        for (i = 0; i < IMGWIDTH; i++)
+        {
+            free(image[i]);
+        }
+        free(image);
+
+        k_sem_give(&sem_tasks_output);
         
         /* Wait for next release instant */
         fin_time = k_uptime_get();
@@ -644,9 +658,10 @@ void thread_obscount_code(void *argA, void *argB, void *argC)
             t_max = fin_time - t_prev;
             
         t_prev = fin_time;
+        
+        irq_unlock(key3);
 
-        // printk("Task %s arrived at %lld inter-arrival time (us): min: %lld / max: %lld \n\r", "near obstacle", (long long)k_uptime_get(), t_min, t_max);
-
+        printk("$obs count -> %lld\n", (long long) k_uptime_get());
         
     }
 }
@@ -681,10 +696,14 @@ static void uart_cb(const struct device *dev, struct uart_event *evt, void *user
             }
             memcpy(&rx_chars[uart_rxbuf_nchar],&(rx_buf[evt->data.rx.offset]),evt->data.rx.len); 
             uart_rxbuf_nchar += evt->data.rx.len; 
-            
-            
-            printk("%d", evt->data.rx.len);   
-
+                
+            if(uart_rxbuf_nchar == RXBUF_SIZE){
+                uart_rxbuf_nchar = 0;  
+                k_sem_give(&sem_rcvimg);
+                key1 = irq_lock();
+                key2 = irq_lock();
+                key3 = irq_lock();
+            }
 		    break;
 
 	    case UART_RX_BUF_REQUEST:
