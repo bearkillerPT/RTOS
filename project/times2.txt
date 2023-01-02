@@ -1,204 +1,1301 @@
-$Receive image -> 28594 
+
+UART_RX_RDY event 
+Received 11520 bytes. nchar= 0, 0
+UART_RX_RDY event 
+Received 1 bytes. nchar= 11520, 11520
+UART_RX_RDY event 
+Received 1 bytes. nchar= 11521, 11521
+UART_RX_RDY event 
+Received 2 bytes. nchar= 11522, 11522
+UART_RX_RDY event 
+Received 4860 bytes. nchar= 11524, 11524
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 28594
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=000, guideline angle=000.000
+        0 obstacles detected
 $Near obs -> 28635
 $Receive image -> 28637
+Detecting position and guideline angle...
 $orientation -> 28657
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        0 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 28691
-$Receive image -> 33638 
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
+UART_RX_RDY event 
+Received 16384 bytes. nchar= 0, 0
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 33638
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
 $Near obs -> 33807
 $Receive image -> 33829
+Detecting position and guideline angle...
 $orientation -> 33877
+        Closeby obstacles detected: No
+        Robot position=127, guideline angle=-0.46988
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 33994
-$Receive image -> 38701 
+        Closeby obstacles detected: No
+        Robot position=127, guideline angle=-0.46988
+        20 obstacles detected
+UART_RX_RDY event 
+Received 1280 bytes. nchar= 0, 0
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1280, 1280
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1281, 1281
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1282, 1282
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1284, 1284
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1285, 1285
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1287, 1287
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1288, 1288
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1290, 1290
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1291, 1291
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1293, 1293
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1294, 1294
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1295, 1295
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1297, 1297
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1298, 1298
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1300, 1300
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1301, 1301
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1303, 1303
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1304, 1304
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1306, 1306
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1307, 1307
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1308, 1308
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1309, 1309
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1310, 1310
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1311, 1311
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1312, 1312
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1313, 1313
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1315, 1315
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1316, 1316
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1317, 1317
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1319, 1319
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1320, 1320
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1321, 1321
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1323, 1323
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1324, 1324
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1326, 1326
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1327, 1327
+UART_RX_RDY event 
+Received 15055 bytes. nchar= 1329, 1329
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 38701
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=127, guideline angle=-0.46988
+        20 obstacles detected
 $Near obs -> 38870
 $Receive image -> 38892
+Detecting position and guideline angle...
 $orientation -> 38941
+        Closeby obstacles detected: No
+        Robot position=127, guideline angle=-0.46988
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 39057
-$Receive image -> 43725 
+        Closeby obstacles detected: No
+        Robot position=127, guideline angle=-0.46988
+        20 obstacles detected
+UART_RX_RDY event 
+Received 2560 bytes. nchar= 0, 0
+UART_RX_RDY event 
+Received 1 bytes. nchar= 2560, 2560
+UART_RX_RDY event 
+Received 9469 bytes. nchar= 2561, 2561
+UART_RX_RDY event 
+Received 1 bytes. nchar= 12030, 12030
+UART_RX_RDY event 
+Received 1 bytes. nchar= 12031, 12031
+UART_RX_RDY event 
+Received 1 bytes. nchar= 12032, 12032
+UART_RX_RDY event 
+Received 1 bytes. nchar= 12033, 12033
+UART_RX_RDY event 
+Received 1 bytes. nchar= 12034, 12034
+UART_RX_RDY event 
+Received 1 bytes. nchar= 12035, 12035
+UART_RX_RDY event 
+Received 1 bytes. nchar= 12036, 12036
+UART_RX_RDY event 
+Received 2 bytes. nchar= 12037, 12037
+UART_RX_RDY event 
+Received 4345 bytes. nchar= 12039, 12039
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 43725
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=127, guideline angle=-0.46988
+        20 obstacles detected
 $Near obs -> 43894
 $Receive image -> 43915
+Detecting position and guideline angle...
 $orientation -> 43964
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 44080
-$Receive image -> 48709 
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
+UART_RX_RDY event 
+Received 6400 bytes. nchar= 0, 0
+UART_RX_RDY event 
+Received 2 bytes. nchar= 6400, 6400
+UART_RX_RDY event 
+Received 2 bytes. nchar= 6402, 6402
+UART_RX_RDY event 
+Received 9980 bytes. nchar= 6404, 6404
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 48709
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
 $Near obs -> 48878
 $Receive image -> 48900
+Detecting position and guideline angle...
 $orientation -> 48949
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 49065
-$Receive image -> 53734 
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
+UART_RX_RDY event 
+Received 16384 bytes. nchar= 0, 0
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 53734
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
 $Near obs -> 53903
 $Receive image -> 53924
+Detecting position and guideline angle...
 $orientation -> 53973
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 54089
-$Receive image -> 58755 
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
+UART_RX_RDY event 
+Received 12800 bytes. nchar= 0, 0
+UART_RX_RDY event 
+Received 1 bytes. nchar= 12800, 12800
+UART_RX_RDY event 
+Received 1780 bytes. nchar= 12801, 12801
+UART_RX_RDY event 
+Received 2 bytes. nchar= 14581, 14581
+UART_RX_RDY event 
+Received 1 bytes. nchar= 14583, 14583
+UART_RX_RDY event 
+Received 1800 bytes. nchar= 14584, 14584
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 58755
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
 $Near obs -> 58924
 $Receive image -> 58946
+Detecting position and guideline angle...
 $orientation -> 58994
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 59111
-$Receive image -> 63763 
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
+UART_RX_RDY event 
+Received 1280 bytes. nchar= 0, 0
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1280, 1280
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1281, 1281
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1283, 1283
+UART_RX_RDY event 
+Received 6083 bytes. nchar= 1285, 1285
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7368, 7368
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7369, 7369
+UART_RX_RDY event 
+Received 2 bytes. nchar= 7370, 7370
+UART_RX_RDY event 
+Received 2 bytes. nchar= 7372, 7372
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7374, 7374
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7375, 7375
+UART_RX_RDY event 
+Received 2 bytes. nchar= 7376, 7376
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7378, 7378
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7379, 7379
+UART_RX_RDY event 
+Received 2 bytes. nchar= 7380, 7380
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7382, 7382
+UART_RX_RDY event 
+Received 2 bytes. nchar= 7383, 7383
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7385, 7385
+UART_RX_RDY event 
+Received 2 bytes. nchar= 7386, 7386
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7388, 7388
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7389, 7389
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7390, 7390
+UART_RX_RDY event 
+Received 2 bytes. nchar= 7391, 7391
+UART_RX_RDY event 
+Received 8991 bytes. nchar= 7393, 7393
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 63763
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
 $Near obs -> 63932
 $Receive image -> 63954
+Detecting position and guideline angle...
 $orientation -> 64003
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 64119
-$Receive image -> 68724 
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
+UART_RX_RDY event 
+Received 16384 bytes. nchar= 0, 0
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 68724
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
 $Near obs -> 68892
 $Receive image -> 68914
+Detecting position and guideline angle...
 $orientation -> 68963
+        Closeby obstacles detected: No
+        Robot position=127, guideline angle=-0.46988
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 69079
-$Receive image -> 73754 
+        Closeby obstacles detected: No
+        Robot position=127, guideline angle=-0.46988
+        20 obstacles detected
+UART_RX_RDY event 
+Received 7680 bytes. nchar= 0, 0
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7680, 7680
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7681, 7681
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7682, 7682
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7683, 7683
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7684, 7684
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7685, 7685
+UART_RX_RDY event 
+Received 2 bytes. nchar= 7686, 7686
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7688, 7688
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7689, 7689
+UART_RX_RDY event 
+Received 2 bytes. nchar= 7690, 7690
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7692, 7692
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7693, 7693
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7694, 7694
+UART_RX_RDY event 
+Received 2 bytes. nchar= 7695, 7695
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7697, 7697
+UART_RX_RDY event 
+Received 2 bytes. nchar= 7698, 7698
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7700, 7700
+UART_RX_RDY event 
+Received 2 bytes. nchar= 7701, 7701
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7703, 7703
+UART_RX_RDY event 
+Received 2 bytes. nchar= 7704, 7704
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7706, 7706
+UART_RX_RDY event 
+Received 8677 bytes. nchar= 7707, 7707
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 73754
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=127, guideline angle=-0.46988
+        20 obstacles detected
 $Near obs -> 73922
 $Receive image -> 73944
+Detecting position and guideline angle...
 $orientation -> 73993
+        Closeby obstacles detected: No
+        Robot position=127, guideline angle=-0.46988
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 74109
-$Receive image -> 78755 
+        Closeby obstacles detected: No
+        Robot position=127, guideline angle=-0.46988
+        20 obstacles detected
+UART_RX_RDY event 
+Received 3840 bytes. nchar= 0, 0
+UART_RX_RDY event 
+Received 1 bytes. nchar= 3840, 3840
+UART_RX_RDY event 
+Received 1 bytes. nchar= 3841, 3841
+UART_RX_RDY event 
+Received 2 bytes. nchar= 3842, 3842
+UART_RX_RDY event 
+Received 1 bytes. nchar= 3844, 3844
+UART_RX_RDY event 
+Received 1 bytes. nchar= 3845, 3845
+UART_RX_RDY event 
+Received 1 bytes. nchar= 3846, 3846
+UART_RX_RDY event 
+Received 1 bytes. nchar= 3847, 3847
+UART_RX_RDY event 
+Received 8262 bytes. nchar= 3848, 3848
+UART_RX_RDY event 
+Received 1 bytes. nchar= 12110, 12110
+UART_RX_RDY event 
+Received 1 bytes. nchar= 12111, 12111
+UART_RX_RDY event 
+Received 4272 bytes. nchar= 12112, 12112
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 78755
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=127, guideline angle=-0.46988
+        20 obstacles detected
 $Near obs -> 78924
 $Receive image -> 78946
+Detecting position and guideline angle...
 $orientation -> 78994
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 79110
-$Receive image -> 83722 
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        21 obstacles detected
+UART_RX_RDY event 
+Received 2560 bytes. nchar= 0, 0
+UART_RX_RDY event 
+Received 1 bytes. nchar= 2560, 2560
+UART_RX_RDY event 
+Received 13823 bytes. nchar= 2561, 2561
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 83722
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        21 obstacles detected
 $Near obs -> 83890
 $Receive image -> 83912
+Detecting position and guideline angle...
 $orientation -> 83961
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        21 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 84077
-$Receive image -> 88735 
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
+UART_RX_RDY event 
+Received 14080 bytes. nchar= 0, 0
+UART_RX_RDY event 
+Received 2 bytes. nchar= 14080, 14080
+UART_RX_RDY event 
+Received 2 bytes. nchar= 14082, 14082
+UART_RX_RDY event 
+Received 2300 bytes. nchar= 14084, 14084
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 88735
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
 $Near obs -> 88904
 $Receive image -> 88926
+Detecting position and guideline angle...
 $orientation -> 88974
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 89090
-$Receive image -> 93743 
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        21 obstacles detected
+UART_RX_RDY event 
+Received 1280 bytes. nchar= 0, 0
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1280, 1280
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1282, 1282
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1283, 1283
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1284, 1284
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1285, 1285
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1287, 1287
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1288, 1288
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1290, 1290
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1292, 1292
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1293, 1293
+UART_RX_RDY event 
+Received 15090 bytes. nchar= 1294, 1294
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 93743
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        21 obstacles detected
 $Near obs -> 93911
 $Receive image -> 93933
+Detecting position and guideline angle...
 $orientation -> 93982
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        21 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 94097
-$Receive image -> 98751 
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        21 obstacles detected
+UART_RX_RDY event 
+Received 7680 bytes. nchar= 0, 0
+UART_RX_RDY event 
+Received 1 bytes. nchar= 7680, 7680
+UART_RX_RDY event 
+Received 8703 bytes. nchar= 7681, 7681
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 98751
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        21 obstacles detected
 $Near obs -> 98920
 $Receive image -> 98941
+Detecting position and guideline angle...
 $orientation -> 98990
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        21 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 99107
-$Receive image -> 10374 
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
+UART_RX_RDY event 
+Received 16384 bytes. nchar= 0, 0
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 103745
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
 $Near obs -> 103914
 $Receive image -> 103936
+Detecting position and guideline angle...
 $orientation -> 103985
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 104101
-$Receive image -> 10875 
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
+UART_RX_RDY event 
+Received 16384 bytes. nchar= 0, 0
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 108755
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
 $Near obs -> 108924
 $Receive image -> 108946
+Detecting position and guideline angle...
 $orientation -> 108994
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 109110
-$Receive image -> 11375 
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        21 obstacles detected
+UART_RX_RDY event 
+Received 16384 bytes. nchar= 0, 0
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 113758
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        21 obstacles detected
 $Near obs -> 113926
 $Receive image -> 113948
+Detecting position and guideline angle...
 $orientation -> 113997
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        21 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 114113
-$Receive image -> 11877 
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
+UART_RX_RDY event 
+Received 16384 bytes. nchar= 0, 0
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 118771
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
 $Near obs -> 118941
 $Receive image -> 118963
+Detecting position and guideline angle...
 $orientation -> 119012
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 119128
-$Receive image -> 12376 
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
+UART_RX_RDY event 
+Received 6400 bytes. nchar= 0, 0
+UART_RX_RDY event 
+Received 1 bytes. nchar= 6400, 6400
+UART_RX_RDY event 
+Received 1 bytes. nchar= 6401, 6401
+UART_RX_RDY event 
+Received 2 bytes. nchar= 6402, 6402
+UART_RX_RDY event 
+Received 2 bytes. nchar= 6404, 6404
+UART_RX_RDY event 
+Received 1 bytes. nchar= 6406, 6406
+UART_RX_RDY event 
+Received 2 bytes. nchar= 6407, 6407
+UART_RX_RDY event 
+Received 1 bytes. nchar= 6409, 6409
+UART_RX_RDY event 
+Received 1 bytes. nchar= 6410, 6410
+UART_RX_RDY event 
+Received 2 bytes. nchar= 6411, 6411
+UART_RX_RDY event 
+Received 2 bytes. nchar= 6413, 6413
+UART_RX_RDY event 
+Received 1 bytes. nchar= 6415, 6415
+UART_RX_RDY event 
+Received 2 bytes. nchar= 6416, 6416
+UART_RX_RDY event 
+Received 2 bytes. nchar= 6418, 6418
+UART_RX_RDY event 
+Received 1 bytes. nchar= 6420, 6420
+UART_RX_RDY event 
+Received 1 bytes. nchar= 6421, 6421
+UART_RX_RDY event 
+Received 1 bytes. nchar= 6422, 6422
+UART_RX_RDY event 
+Received 1 bytes. nchar= 6423, 6423
+UART_RX_RDY event 
+Received 9960 bytes. nchar= 6424, 6424
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 123767
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
 $Near obs -> 123937
 $Receive image -> 123959
+Detecting position and guideline angle...
 $orientation -> 124007
+        Closeby obstacles detected: No
+        Robot position=127, guideline angle=-0.46988
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 124124
-$Receive image -> 12878 
+        Closeby obstacles detected: No
+        Robot position=127, guideline angle=-0.46988
+        20 obstacles detected
+UART_RX_RDY event 
+Received 16384 bytes. nchar= 0, 0
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 128781
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=127, guideline angle=-0.46988
+        20 obstacles detected
 $Near obs -> 128950
 $Receive image -> 128972
+Detecting position and guideline angle...
 $orientation -> 129021
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 129136
-$Receive image -> 13380 
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        21 obstacles detected
+UART_RX_RDY event 
+Received 16384 bytes. nchar= 0, 0
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 133803
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        21 obstacles detected
 $Near obs -> 133972
 $Receive image -> 133994
+Detecting position and guideline angle...
 $orientation -> 134042
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        21 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 134158
-$Receive image -> 13879 
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        21 obstacles detected
+UART_RX_RDY event 
+Received 6400 bytes. nchar= 0, 0
+UART_RX_RDY event 
+Received 1 bytes. nchar= 6400, 6400
+UART_RX_RDY event 
+Received 1 bytes. nchar= 6401, 6401
+UART_RX_RDY event 
+Received 2 bytes. nchar= 6402, 6402
+UART_RX_RDY event 
+Received 1 bytes. nchar= 6404, 6404
+UART_RX_RDY event 
+Received 1 bytes. nchar= 6405, 6405
+UART_RX_RDY event 
+Received 9978 bytes. nchar= 6406, 6406
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 138796
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        21 obstacles detected
 $Near obs -> 138964
 $Receive image -> 138986
+Detecting position and guideline angle...
 $orientation -> 139035
+        Closeby obstacles detected: No
+        Robot position=127, guideline angle=-0.46988
+        21 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 139152
-$Receive image -> 14379 
+        Closeby obstacles detected: No
+        Robot position=127, guideline angle=-0.46988
+        20 obstacles detected
+UART_RX_RDY event 
+Received 16384 bytes. nchar= 0, 0
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 143797
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=127, guideline angle=-0.46988
+        20 obstacles detected
 $Near obs -> 143966
 $Receive image -> 143988
+Detecting position and guideline angle...
 $orientation -> 144037
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 144154
-$Receive image -> 14880 
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
+UART_RX_RDY event 
+Received 16384 bytes. nchar= 0, 0
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 148803
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
 $Near obs -> 148973
 $Receive image -> 148994
+Detecting position and guideline angle...
 $orientation -> 149043
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 149159
-$Receive image -> 15385 
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        21 obstacles detected
+UART_RX_RDY event 
+Received 8960 bytes. nchar= 0, 0
+UART_RX_RDY event 
+Received 1 bytes. nchar= 8960, 8960
+UART_RX_RDY event 
+Received 1 bytes. nchar= 8961, 8961
+UART_RX_RDY event 
+Received 2 bytes. nchar= 8962, 8962
+UART_RX_RDY event 
+Received 1 bytes. nchar= 8964, 8964
+UART_RX_RDY event 
+Received 1 bytes. nchar= 8965, 8965
+UART_RX_RDY event 
+Received 2 bytes. nchar= 8966, 8966
+UART_RX_RDY event 
+Received 1 bytes. nchar= 8968, 8968
+UART_RX_RDY event 
+Received 1 bytes. nchar= 8969, 8969
+UART_RX_RDY event 
+Received 2721 bytes. nchar= 8970, 8970
+UART_RX_RDY event 
+Received 2 bytes. nchar= 11691, 11691
+UART_RX_RDY event 
+Received 1 bytes. nchar= 11693, 11693
+UART_RX_RDY event 
+Received 1 bytes. nchar= 11694, 11694
+UART_RX_RDY event 
+Received 4689 bytes. nchar= 11695, 11695
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 153855
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        21 obstacles detected
 $Near obs -> 154024
 $Receive image -> 154045
+Detecting position and guideline angle...
 $orientation -> 154094
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        21 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 154210
-$Receive image -> 15880 
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        21 obstacles detected
+UART_RX_RDY event 
+Received 1280 bytes. nchar= 0, 0
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1280, 1280
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1282, 1282
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1284, 1284
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1286, 1286
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1288, 1288
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1290, 1290
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1291, 1291
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1292, 1292
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1293, 1293
+UART_RX_RDY event 
+Received 15090 bytes. nchar= 1294, 1294
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 158807
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        21 obstacles detected
 $Near obs -> 158975
 $Receive image -> 158997
+Detecting position and guideline angle...
 $orientation -> 159046
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        21 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 159162
-$Receive image -> 16380 
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
+UART_RX_RDY event 
+Received 16384 bytes. nchar= 0, 0
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 163809
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
 $Near obs -> 163978
 $Receive image -> 164000
+Detecting position and guideline angle...
 $orientation -> 164049
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 164165
-$Receive image -> 16881 
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
+UART_RX_RDY event 
+Received 3840 bytes. nchar= 0, 0
+UART_RX_RDY event 
+Received 1 bytes. nchar= 3840, 3840
+UART_RX_RDY event 
+Received 1 bytes. nchar= 3841, 3841
+UART_RX_RDY event 
+Received 1 bytes. nchar= 3842, 3842
+UART_RX_RDY event 
+Received 1 bytes. nchar= 3843, 3843
+UART_RX_RDY event 
+Received 2 bytes. nchar= 3844, 3844
+UART_RX_RDY event 
+Received 1 bytes. nchar= 3846, 3846
+UART_RX_RDY event 
+Received 2 bytes. nchar= 3847, 3847
+UART_RX_RDY event 
+Received 2 bytes. nchar= 3849, 3849
+UART_RX_RDY event 
+Received 1 bytes. nchar= 3851, 3851
+UART_RX_RDY event 
+Received 2 bytes. nchar= 3852, 3852
+UART_RX_RDY event 
+Received 2 bytes. nchar= 3854, 3854
+UART_RX_RDY event 
+Received 2 bytes. nchar= 3856, 3856
+UART_RX_RDY event 
+Received 1 bytes. nchar= 3858, 3858
+UART_RX_RDY event 
+Received 12525 bytes. nchar= 3859, 3859
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 168810
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
 $Near obs -> 168979
 $Receive image -> 169001
+Detecting position and guideline angle...
 $orientation -> 169050
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 169166
-$Receive image -> 17383 
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
+UART_RX_RDY event 
+Received 16384 bytes. nchar= 0, 0
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 173832
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
 $Near obs -> 174002
 $Receive image -> 174024
+Detecting position and guideline angle...
 $orientation -> 174072
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 174188
-$Receive image -> 17883 
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        21 obstacles detected
+UART_RX_RDY event 
+Received 16384 bytes. nchar= 0, 0
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 178836
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=0
+        21 obstacles detected
 $Near obs -> 179004
 $Receive image -> 179026
+Detecting position and guideline angle...
 $orientation -> 179075
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        21 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 179191
-$Receive image -> 18384 
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
+UART_RX_RDY event 
+Received 1280 bytes. nchar= 0, 0
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1280, 1280
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1281, 1281
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1283, 1283
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1284, 1284
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1285, 1285
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1286, 1286
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1287, 1287
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1288, 1288
+UART_RX_RDY event 
+Received 1 bytes. nchar= 1289, 1289
+UART_RX_RDY event 
+Received 2 bytes. nchar= 1290, 1290
+UART_RX_RDY event 
+Received 15092 bytes. nchar= 1292, 1292
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 183840
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
 $Near obs -> 184009
 $Receive image -> 184031
+Detecting position and guideline angle...
 $orientation -> 184080
+        Closeby obstacles detected: No
+        Robot position=127, guideline angle=-0.46988
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 184196
-$Receive image -> 18886 
+        Closeby obstacles detected: No
+        Robot position=127, guideline angle=-0.46988
+        20 obstacles detected
+UART_RX_RDY event 
+Received 16384 bytes. nchar= 0, 0
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 188864
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=127, guideline angle=-0.46988
+        20 obstacles detected
 $Near obs -> 189033
 $Receive image -> 189055
+Detecting position and guideline angle...
 $orientation -> 189104
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 189221
-$Receive image -> 19385 
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
+UART_RX_RDY event 
+Received 16384 bytes. nchar= 0, 0
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 193855
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
 $Near obs -> 194024
 $Receive image -> 194046
+Detecting position and guideline angle...
 $orientation -> 194095
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 194212
-$Receive image -> 19886 
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
+UART_RX_RDY event 
+Received 16384 bytes. nchar= 0, 0
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 198865
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=63, guideline angle=-0.015624
+        20 obstacles detected
 $Near obs -> 199035
 $Receive image -> 199057
+Detecting position and guideline angle...
 $orientation -> 199105
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 199222
-$Receive image -> 20386 
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
+UART_RX_RDY event 
+Received 16384 bytes. nchar= 0, 0
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 203863
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
 $Near obs -> 204032
 $Receive image -> 204054
+Detecting position and guideline angle...
 $orientation -> 204103
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 204219
-$Receive image -> 20886 
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
+UART_RX_RDY event 
+Received 16384 bytes. nchar= 0, 0
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> 208866
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
 $Near obs -> 209035
 $Receive image -> 209057
+Detecting position and guideline angle...
 $orientation -> 209106
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 209223
-$Receive image -> UART_ 
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
+UART_RX_RDY event 
+Received 1 bytes. nchar= 0, 0
+UART_RX_RDY event 
+Received 16383 bytes. nchar= 1, 1
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> UART_RX_RDY event 
+Received 1 bytes. nchar= 0, 0
+213878
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=95, guideline angle=-0.25232
+        20 obstacles detected
 $Near obs -> 214086
 $Receive image -> 214108
+Detecting position and guideline angle...
 $orientation -> 214156
+        Closeby obstacles detected: No
+        Robot position=64, guideline angle=-0.015624
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 214273
-$Receive image -> UART_ 
+        Closeby obstacles detected: No
+        Robot position=64, guideline angle=-0.015624
+        20 obstacles detected
+UART_RX_RDY event 
+Received 16383 bytes. nchar= 1, 1
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> UART_RX_RDY event 
+Received 1 bytes. nchar= 0, 0
+218868
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=64, guideline angle=-0.015624
+        20 obstacles detected
 $Near obs -> 219076
 $Receive image -> 219098
+Detecting position and guideline angle...
 $orientation -> 219146
+        Closeby obstacles detected: No
+        Robot position=64, guideline angle=0
+        20 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 219262
-$Receive image -> UART_ 
+        Closeby obstacles detected: No
+        Robot position=64, guideline angle=0
+        21 obstacles detected
+UART_RX_RDY event 
+Received 16383 bytes. nchar= 1, 1
+UART_RX_BUF_RELEASED event 
+$ReceUART_RX_DISABLED event 
+UART_RX_BUF_REQUEST event 
+ive image -> UART_RX_RDY event 
+Received 1 bytes. nchar= 0, 0
+223881
+Detecting nearby obstacles...
+        Closeby obstacles detected: No
+        Robot position=64, guideline angle=0
+        21 obstacles detected
 $Near obs -> 224088
 $Receive image -> 224110
+Detecting position and guideline angle...
 $orientation -> 224159
+        Closeby obstacles detected: No
+        Robot position=64, guideline angle=0
+        21 obstacles detected
+Detecting number of obstacles ...
 $obs count -> 224274
-
-
-
-
+        Closeby obstacles detected: No
+        Robot position=64, guideline angle=0
+        21 obstacles detected
