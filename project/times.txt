@@ -1,41 +1,499 @@
-$Receive image -> 422
-$Near obs -> 17759
-$Receive image -> 17781
-$Near obs -> 22813
-$Receive image -> 22835
-$Near obs -> 27824
-$Receive image -> 27846
-$Near obs -> 32821
-$Receive image -> 32843
-$Near obs -> 37829
-$Receive image -> 37851
-$Near obs -> 42822
-$Receive image -> 42844
-$Near obs -> 47822
-$Receive image -> 47843
-$Near obs -> 52834
-$Receive image -> 52855
-$Near obs -> 57837
-$Receive image -> 57859
-$Near obs -> 62838
-$Receive image -> 62860
-$Near obs -> 67839
-$Receive image -> 67861
-$Near obs -> 72865
-$Receive image -> 72886
-$Near obs -> 77836
-$Receive image -> 77858
-$Near obs -> 82838
-$Receive image -> 82859
-$Near obs -> 87838
-$Receive image -> 87859
-$Near obs -> 92872
-$Receive image -> 92894
-$Near obs -> 97840
-$Receive image -> 97862
-$Near obs -> 102871
-$Receive image -> 102893
-$Near obs -> 107849
-$Receive image -> 107871
-$Near obs -> 112841
-$Receive image -> 112863
+*** Booting Zephyr OS build v3.0.99-ncs1  ***
+UART binding successful
+open cabThread obscount init
+Thread orientation init
+Thread output init
+Thread near_obst$Receive image -> 5607
+$Near obs -> 5629
+$orientation -> 5643
+$obs count -> 5661
+
+$Receive image -> 10608
+$Near obs -> 10629
+$orientation -> 10638
+$obs count -> 10651
+
+$Receive image -> 15601
+$Near obs -> 15622
+$orientation -> 15632
+$obs count -> 15644
+
+$Receive image -> 20622
+$Near obs -> 20643
+$orientation -> 20653
+$obs count -> 20665
+
+$Receive image -> 25616
+$Near obs -> 25637
+$orientation -> 25647
+$obs count -> 25659
+
+$Receive image -> 30623
+$Near obs -> 30644
+$orientation -> 30654
+$obs count -> 30666
+
+$Receive image -> 35639
+$Near obs -> 35660
+$orientation -> 35670
+$obs count -> 35682
+
+$Receive image -> 40636
+$Near obs -> 40656
+$orientation -> 40666
+$obs count -> 40679
+
+$Receive image -> 45652
+$Near obs -> 45673
+$orientation -> 45682
+$obs count -> 45695
+
+$Receive image -> 50644
+$Near obs -> 50685
+$orientation -> 50714
+$obs count -> 50741
+
+$Receive image -> 55649
+$Near obs -> 55690
+$orientation -> 55719
+$obs count -> 55746
+
+$Receive image -> 60647
+$Near obs -> 60687
+$orientation -> 60716
+$obs count -> 60744
+
+$Receive image -> 65656
+$Near obs -> 65696
+$orientation -> 65726
+$obs count -> 65753
+
+$Receive image -> 70656
+$Near obs -> 70696
+$orientation -> 70725
+$obs count -> 70753
+
+$Receive image -> 75661
+$Near obs -> 75701
+$orientation -> 75731
+$obs count -> 75758
+
+$Receive image -> 80675
+$Near obs -> 80715
+$orientation -> 80745
+$obs count -> 80772
+
+$Receive image -> 85676
+$Near obs -> 85717
+$orientation -> 85746
+$obs count -> 85773
+
+$Receive image -> 90683
+$Near obs -> 90723
+$orientation -> 90752
+$obs count -> 90780
+
+$Receive image -> 95681
+$Near obs -> 95722
+$orientation -> 95751
+$obs count -> 95778
+
+$Receive image -> 100682
+$Near obs -> 100723
+$orientation -> 100752
+$obs count -> 100780
+
+$Receive image -> 105692
+$Near obs -> 105733
+$orientation -> 105762
+$obs count -> 105790
+
+$Receive image -> 110680
+$Near obs -> 110721
+$orientation -> 110750
+$obs count -> 110778
+
+$Receive image -> 115682
+$Near obs -> 115723
+$orientation -> 115752
+$obs count -> 115780
+
+$Receive image -> 120712
+$Near obs -> 120753
+$orientation -> 120782
+$obs count -> 120810
+
+$Receive image -> 125713
+$Near obs -> 125754
+$orientation -> 125783
+$obs count -> 125810
+
+$Receive image -> 130706
+$Near obs -> 130747
+$orientation -> 130776
+$obs count -> 130804
+
+$Receive image -> 135716
+$Near obs -> 135757
+$orientation -> 135786
+$obs count -> 135814
+
+$Receive image -> 140714
+$Near obs -> 140754
+$orientation -> 140784
+$obs count -> 140811
+
+$Receive image -> 145713
+$Near obs -> 145754
+$orientation -> 145783
+$obs count -> 145811
+
+$Receive image -> 150706
+$Near obs -> 150747
+$orientation -> 150776
+$obs count -> 150804
+
+$Receive image -> 155710
+$Near obs -> 155750
+$orientation -> 155780
+$obs count -> 155807
+
+$Receive image -> 160712
+$Near obs -> 160752
+$orientation -> 160782
+$obs count -> 160809
+
+$Receive image -> 165702
+$Near obs -> 165743
+$orientation -> 165773
+$obs count -> 165800
+
+$Receive image -> 170714
+$Near obs -> 170755
+$orientation -> 170784
+$obs count -> 170812
+
+$Receive image -> 175718
+$Near obs -> 175759
+$orientation -> 175788
+$obs count -> 175816
+
+$Receive image -> 180721
+$Near obs -> 180762
+$orientation -> 180791
+$obs count -> 180819
+
+$Receive image -> 185751
+$Near obs -> 185792
+$orientation -> 185821
+$obs count -> 185849
+
+$Receive image -> 190735
+$Near obs -> 190775
+$orientation -> 190805
+$obs count -> 190832
+
+$Receive image -> 195744
+$Near obs -> 195785
+$orientation -> 195814
+$obs count -> 195842
+
+$Receive image -> 200744
+$Near obs -> 200784
+$orientation -> 200814
+$obs count -> 200841
+
+$Receive image -> 205760
+$Near obs -> 205800
+$orientation -> 205830
+$obs count -> 205857
+
+$Receive image -> 210819
+$Near obs -> 210860
+$orientation -> 210889
+$obs count -> 210917
+
+$Receive image -> 215809
+$Near obs -> 215850
+$orientation -> 215879
+$obs count -> 215907
+
+$Receive image -> 220819
+$Near obs -> 220859
+$orientation -> 220889
+$obs count -> 220916
+
+$Receive image -> 225833
+$Near obs -> 225874
+$orientation -> 225903
+$obs count -> 225930
+
+$Receive image -> 230851
+$Near obs -> 230892
+$orientation -> 230921
+$obs count -> 230949
+
+$Receive image -> 235872
+$Near obs -> 235913
+$orientation -> 235942
+$obs count -> 235970
+
+$Receive image -> 240875
+$Near obs -> 240916
+$orientation -> 240945
+$obs count -> 240973
+
+$Receive image -> 245880
+$Near obs -> 245921
+$orientation -> 245951
+$obs count -> 245978
+
+$Receive image -> 250882
+$Near obs -> 250923
+$orientation -> 250953
+$obs count -> 250980
+
+$Receive image -> 255887
+$Near obs -> 255927
+$orientation -> 255957
+$obs count -> 255984
+
+$Receive image -> 260909
+$Near obs -> 260949
+$orientation -> 260979
+$obs count -> 261006
+
+$Receive image -> 265908
+$Near obs -> 265949
+$orientation -> 265978
+$obs count -> 266006
+
+$Receive image -> 270919
+$Near obs -> 270959
+$orientation -> 270989
+$obs count -> 271016
+
+$Receive image -> 275916
+$Near obs -> 275957
+$orientation -> 275986
+$obs count -> 276014
+
+$Receive image -> 280920
+$Near obs -> 280960
+$orientation -> 280990
+$obs count -> 281018
+
+$Receive image -> 285922
+$Near obs -> 285963
+$orientation -> 285992
+$obs count -> 286020
+
+$Receive image -> 290943
+$Near obs -> 290984
+$orientation -> 291013
+$obs count -> 291041
+
+$Receive image -> 295925
+$Near obs -> 295966
+$orientation -> 295995
+$obs count -> 296023
+
+$Receive image -> 300944
+$Near obs -> 300984
+$orientation -> 301014
+$obs count -> 301041
+
+$Receive image -> 305956
+$Near obs -> 305996
+$orientation -> 306026
+$obs count -> 306054
+
+$Receive image -> 310966
+$Near obs -> 311007
+$orientation -> 311036
+$obs count -> 311063
+
+$Receive image -> 315965
+$Near obs -> 316006
+$orientation -> 316035
+$obs count -> 316062
+
+$Receive image -> 320963
+$Near obs -> 321003
+$orientation -> 321033
+$obs count -> 321060
+
+$Receive image -> 326005
+$Near obs -> 326046
+$orientation -> 326075
+$obs count -> 326102
+
+$Receive image -> 331004
+$Near obs -> 331045
+$orientation -> 331074
+$obs count -> 331102
+
+$Receive image -> 336019
+$Near obs -> 336060
+$orientation -> 336089
+$obs count -> 336117
+
+$Receive image -> 341023
+$Near obs -> 341064
+$orientation -> 341093
+$obs count -> 341121
+
+$Receive image -> 346024
+$Near obs -> 346065
+$orientation -> 346095
+$obs count -> 346122
+
+$Receive image -> 351032
+$Near obs -> 351072
+$orientation -> 351102
+$obs count -> 351129
+
+$Receive image -> 356053
+$Near obs -> 356093
+$orientation -> 356123
+$obs count -> 356151
+
+$Receive image -> 361049
+$Near obs -> 361090
+$orientation -> 361119
+$obs count -> 361146
+
+$Receive image -> 366051
+$Near obs -> 366092
+$orientation -> 366121
+$obs count -> 366149
+
+$Receive image -> 371049
+$Near obs -> 371090
+$orientation -> 371119
+$obs count -> 371147
+
+$Receive image -> 376053
+$Near obs -> 376093
+$orientation -> 376123
+$obs count -> 376150
+
+$Receive image -> 381073
+$Near obs -> 381113
+$orientation -> 381143
+$obs count -> 381170
+
+$Receive image -> 386074
+$Near obs -> 386115
+$orientation -> 386144
+$obs count -> 386172
+
+$Receive image -> 391076
+$Near obs -> 391117
+$orientation -> 391146
+$obs count -> 391174
+
+$Receive image -> 396075
+$Near obs -> 396116
+$orientation -> 396145
+$obs count -> 396173
+
+$Receive image -> 401082
+$Near obs -> 401123
+$orientation -> 401152
+$obs count -> 401180
+
+$Receive image -> 406097
+$Near obs -> 406138
+$orientation -> 406167
+$obs count -> 406195
+
+$Receive image -> 411093
+$Near obs -> 411134
+$orientation -> 411163
+$obs count -> 411191
+
+$Receive image -> 416081
+$Near obs -> 416122
+$orientation -> 416152
+$obs count -> 416179
+
+$Receive image -> 421099
+$Near obs -> 421140
+$orientation -> 421169
+$obs count -> 421196
+
+$Receive image -> 426096
+$Near obs -> 426137
+$orientation -> 426166
+$obs count -> 426193
+
+$Receive image -> 431098
+$Near obs -> 431138
+$orientation -> 431168
+$obs count -> 431195
+
+$Receive image -> 436128
+$Near obs -> 436169
+$orientation -> 436199
+$obs count -> 436226
+
+$Receive image -> 441111
+$Near obs -> 441152
+$orientation -> 441181
+$obs count -> 441209
+
+$Receive image -> 446120
+$Near obs -> 446160
+$orientation -> 446190
+$obs count -> 446217
+
+$Receive image -> 451137
+$Near obs -> 451177
+$orientation -> 451207
+$obs count -> 451234
+
+$Receive image -> 456118
+$Near obs -> 456158
+$orientation -> 456188
+$obs count -> 456215
+
+$Receive image -> 461133
+$Near obs -> 461174
+$orientation -> 461203
+$obs count -> 461231
+
+$Receive image -> 466138
+$Near obs -> 466179
+$orientation -> 466208
+$obs count -> 466236
+
+$Receive image -> 471131
+$Near obs -> 471172
+$orientation -> 471201
+$obs count -> 471229
+
+$Receive image -> 476133
+$Near obs -> 476173
+$orientation -> 476203
+$obs count -> 476230
+
+$Receive image -> 481139
+$Near obs -> 481179
+$orientation -> 481209
+$obs count -> 481236
+
+$Receive image -> 486142
+$Near obs -> 486182
+$orientation -> 486212
+$obs count -> 486239
+
+$Receive image -> 491135
+$Near obs -> 491175
+$orientation -> 491205
+$obs count -> 491232
+
+$Receive image -> 496134
+$Near obs -> 496175
+$orientation -> 496204
+$obs count -> 496232

@@ -392,12 +392,10 @@ void thread_near_obstacle_code(void *argA, void *argB, void *argC)
     /* Thread loop */
     while (1)
     {
-        printk("$Receive image -> %lld\n", (long long) k_uptime_get());
-
         /* Do the workload */
         k_sem_take(&sem_rcvimg_nearobs, K_FOREVER);
 
-        printk("Detecting nearby obstacles...\n");
+        // printk("Detecting nearby obstacles...\n");
 
         uint8_t* cab_img = (uint8_t*)get_mes(image_cab);
         
@@ -473,7 +471,7 @@ void thread_orientation_code(void *argA, void *argB, void *argC)
         uint8_t ** image = castImage(cab_img);
         unget((void*)cab_img, image_cab);
 
-        printk("Detecting position and guideline angle...\n");
+        // printk("Detecting position and guideline angle...\n");
         int i, gf_pos;
 
         /* Inits */
@@ -570,11 +568,11 @@ void thread_output_code(void *argA, void *argB, void *argC)
         /* Do the workload */
         k_sem_take(&sem_tasks_output, K_FOREVER);
         
-        printk("\tCloseby obstacles detected: %s\n\r", nearobs_output==1? "Yes" : "No");
+        // printk("\tCloseby obstacles detected: %s\n\r", nearobs_output==1? "Yes" : "No");
         
-        printk("\tRobot position=%s, guideline angle=%s\n\r", orientation_output[0], orientation_output[1]);
+        // printk("\tRobot position=%s, guideline angle=%s\n\r", orientation_output[0], orientation_output[1]);
 
-        printk("\t%d obstacles detected\n\r", obscount_output);
+        // printk("\t%d obstacles detected\n\r", obscount_output);
         
         /* Wait for next release instant */
         fin_time = k_uptime_get();
@@ -612,7 +610,7 @@ void thread_obscount_code(void *argA, void *argB, void *argC)
 
         unget((void*)cab_img, image_cab);
     
-	    printk("Detecting number of obstacles ...\n");
+	    // printk("Detecting number of obstacles ...\n");
         int i, j, nobs;
 
         /* Inits */
@@ -661,7 +659,7 @@ void thread_obscount_code(void *argA, void *argB, void *argC)
         
         irq_unlock(key3);
 
-        printk("$obs count -> %lld\n", (long long) k_uptime_get());
+        printk("$obs count -> %lld\n\n", (long long) k_uptime_get());
         
     }
 }
@@ -678,17 +676,17 @@ static void uart_cb(const struct device *dev, struct uart_event *evt, void *user
     switch (evt->type) {
 	
         case UART_TX_DONE:
-		    printk("UART_TX_DONE event \n\r");
+		    // printk("UART_TX_DONE event \n\r");
             break;
 
     	case UART_TX_ABORTED:
-	    	printk("UART_TX_ABORTED event \n\r");
+	    	// printk("UART_TX_ABORTED event \n\r");
 		    break;
 		
 	    case UART_RX_RDY:
-		    printk("UART_RX_RDY event \n\r");
+		    // printk("UART_RX_RDY event \n\r");
             /* Just copy data to a buffer. Usually it is preferable to use e.g. a FIFO to communicate with a task that shall process the messages*/
-            printk("Received %d bytes. nchar= %d, %d\n", evt->data.rx.len, uart_rxbuf_nchar, evt->data.rx.offset);
+            // printk("Received %d bytes. nchar= %d, %d\n", evt->data.rx.len, uart_rxbuf_nchar, evt->data.rx.offset);
             if(uart_rxbuf_nchar + evt->data.rx.len > RXBUF_SIZE){
                 printk("Error. Received more data than expected for %d x %d \n", IMGWIDTH, IMGWIDTH);
                 uart_rxbuf_nchar = 0;
@@ -711,7 +709,7 @@ static void uart_cb(const struct device *dev, struct uart_event *evt, void *user
 		    break;
 
 	    case UART_RX_BUF_RELEASED:
-		    printk("UART_RX_BUF_RELEASED event \n\r");
+		    // printk("UART_RX_BUF_RELEASED event \n\r");
 		    break;
 		
 	    case UART_RX_DISABLED: 
@@ -726,11 +724,11 @@ static void uart_cb(const struct device *dev, struct uart_event *evt, void *user
 		    break;
 
 	    case UART_RX_STOPPED:
-		    printk("UART_RX_STOPPED event \n\r");
+		    // printk("UART_RX_STOPPED event \n\r");
 		    break;
 		
 	    default:
-            printk("UART: unknown event \n\r");
+            // printk("UART: unknown event \n\r");
 		    break;
     }
     
