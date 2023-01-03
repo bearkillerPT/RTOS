@@ -707,7 +707,7 @@ static void uart_cb(const struct device *dev, struct uart_event *evt, void *user
 		    break;
 
 	    case UART_RX_BUF_REQUEST:
-		    printk("UART_RX_BUF_REQUEST event \n\r");
+		    // printk("UART_RX_BUF_REQUEST event \n\r");
 		    break;
 
 	    case UART_RX_BUF_RELEASED:
@@ -717,7 +717,7 @@ static void uart_cb(const struct device *dev, struct uart_event *evt, void *user
 	    case UART_RX_DISABLED: 
             /* When the RX_BUFF becomes full RX is is disabled automaticaly.  */
             /* It must be re-enabled manually for continuous reception */
-            printk("UART_RX_DISABLED event \n\r");
+            // printk("UART_RX_DISABLED event \n\r");
 		    err =  uart_rx_enable(uart_dev ,rx_buf,sizeof(rx_buf),RX_TIMEOUT);
             if (err) {
                 printk("uart_rx_enable() error. Error code:%d\n\r",err);
@@ -733,7 +733,7 @@ static void uart_cb(const struct device *dev, struct uart_event *evt, void *user
             printk("UART: unknown event \n\r");
 		    break;
     }
-
+    
 }
 
 uint8_t** castImage(uint8_t* img){
