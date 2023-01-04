@@ -1,3 +1,4 @@
+// Based on: G. C. Buttazzo, "HARTIK: A real-time kernel for robotics applications" 
 #include <zephyr.h>
 #include <stdint.h>
 #include <stddef.h>
