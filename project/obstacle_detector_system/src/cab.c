@@ -12,7 +12,7 @@
 
 struct cab
 {
-    struct k_sem *op_Sem;
+    struct k_mutex *op_Mutex;
     char *name;
     int num;
     size_t dim;
@@ -27,8 +27,8 @@ cab *open_cab(char *name, int num, size_t dim, void *first)
     new_cab->name = name;
     new_cab->num = num;
     new_cab->dim = dim;
-    new_cab->op_Sem = (struct k_sem*)calloc(1, sizeof(struct k_sem));
-    k_sem_init(new_cab->op_Sem, 1, 1);
+    new_cab->op_Mutex = (struct k_mutex*)calloc(1, sizeof(struct k_mutex));
+    k_mutex_init(new_cab->op_Mutex);
     // allocate the buffersTaken array
     new_cab->buffersTaken = (uint8_t *)calloc(num, sizeof(uint8_t));
     for (size_t i = 0; i < num; i++)
@@ -49,25 +49,28 @@ cab *open_cab(char *name, int num, size_t dim, void *first)
 // returns a new buffer
 void *reserve(cab *cab_id)
 {
-    k_sem_take(cab_id->op_Sem, K_FOREVER);
+    k_mutex_lock(cab_id->op_Mutex, K_FOREVER);
+    
     // find a free buffer
     for (size_t i = 0; i < cab_id->num; i++)
     {
         if (cab_id->buffersTaken[i] == 0)
         {
             cab_id->buffersTaken[i] = 1;
-            k_sem_give(cab_id->op_Sem);
+            k_mutex_unlock(cab_id->op_Mutex);
             return cab_id->buffers[i];
         }
     }
-    k_sem_give(cab_id->op_Sem);
+            k_mutex_unlock(cab_id->op_Mutex);
+    
     return NULL;
 }
 
 // puts a filled buffer inside the CAB
 void put_mes(void *buf_pointer, cab *cab_id)
 {
-    k_sem_take(cab_id->op_Sem, K_FOREVER);
+    k_mutex_lock(cab_id->op_Mutex, K_FOREVER);
+    
 
     for (size_t i = 0; i < cab_id->num; i++)
     {
@@ -77,13 +80,15 @@ void put_mes(void *buf_pointer, cab *cab_id)
             cab_id->buffersTaken[i] = 0;
         }
     }
-    k_sem_give(cab_id->op_Sem);
+            k_mutex_unlock(cab_id->op_Mutex);
+    
 }
 
 // get latest message
 void *get_mes(cab *cab_id)
 {
-    k_sem_take(cab_id->op_Sem, K_FOREVER);
+    k_mutex_lock(cab_id->op_Mutex, K_FOREVER);
+    
     // find a free buffer
     for (size_t i = 0; i < cab_id->num; i++)
     {
@@ -91,18 +96,21 @@ void *get_mes(cab *cab_id)
         {
             cab_id->buffersTaken[i] = 1;
             memcpy(cab_id->buffers[i], cab_id->buffers[0], cab_id->dim);
-            k_sem_give(cab_id->op_Sem);
+            k_mutex_unlock(cab_id->op_Mutex);
+            
             return cab_id->buffers[i];
         }
     }
-    k_sem_give(cab_id->op_Sem);
+            k_mutex_unlock(cab_id->op_Mutex);
+    
     return NULL;
 }
 
 // release message to the CAB
 void unget(void* mes_pointer, cab *cab_id)
 {
-    k_sem_take(cab_id->op_Sem, K_FOREVER);
+    k_mutex_lock(cab_id->op_Mutex, K_FOREVER);
+    
     for (size_t i = 0; i < cab_id->num; i++)
     {
         if (cab_id->buffers[i] == mes_pointer)
@@ -110,7 +118,8 @@ void unget(void* mes_pointer, cab *cab_id)
             cab_id->buffersTaken[i] = 0;
         }
     }
-    k_sem_give(cab_id->op_Sem);
+            k_mutex_unlock(cab_id->op_Mutex);
+    
 }
 
 int test(int argc, char const *argv[])

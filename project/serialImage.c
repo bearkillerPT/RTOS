@@ -34,6 +34,8 @@
 #include <unistd.h>  // write(), read(), close()
 
 #define IMGWIDTH 128 /* Square image. Side size, in pixels*/
+uint8_t HANDSHAKE_MESSAGE = 0x01;
+uint8_t ACK_MESSAGE = 0x01;
 
 void readRawImage(char *filename, uint8_t *image);
 
@@ -41,7 +43,6 @@ int main()
 {
   // Open the serial port. Change device path as needed (currently set to an standard FTDI USB-UART cable type device)
   int serial_port = open("/dev/ttyACM0", O_RDWR);
-  
 
   // Create new termios struct, we call it 'tty' for convention
   struct termios tty;
@@ -52,7 +53,6 @@ int main()
     printf("Error %i from tcgetattr: %s\n", errno, strerror(errno));
     return 1;
   }
-  
 
   tty.c_cflag &= ~PARENB;        // Clear parity bit, disabling parity (most common)
   tty.c_cflag &= ~CSTOPB;        // Clear stop field, only one stop bit used in communication (most common)
@@ -87,41 +87,60 @@ int main()
     printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
     return 1;
   }
-  
 
   for (int image_index = 1; image_index < 100; image_index++)
   {
     uint8_t *imageBuffer = calloc(IMGWIDTH * IMGWIDTH, sizeof(char));
     char *filename = calloc(20, sizeof(char));
     sprintf(filename, "images/img%d.raw", image_index);
-    
-    readRawImage(filename, imageBuffer);
-    
-    
-    // Read bytes. The behaviour of read() (e.g. does it block?,
-    // how long does it block for?) depends on the configuration
-    // settings above, specifically VMIN and VTIME
-    ssize_t bytes_written = write(serial_port, imageBuffer, sizeof(uint8_t) * IMGWIDTH * IMGWIDTH);
 
-    // n is the number of bytes read. n may be 0 if no bytes were received, and can also be -1 to signal an error.
-    if (bytes_written < 0)
+    uint8_t ack_message;
+    int bytes_read = 0;
+    
+    while (bytes_read != 1)
     {
-      printf("Error sending message: %s", strerror(errno));
-      exit(1);
+      int bytes_written = write(serial_port, &HANDSHAKE_MESSAGE, sizeof(uint8_t));
+      if (bytes_written < 0)
+      {
+        printf("Error sending handshake message\n");
+        fflush(stdout);
+        exit(1);
+      }
+      else
+        printf("Sent HANDSHAKE\n");
+
+      bytes_read = read(serial_port, &ack_message, sizeof(uint8_t));
+      printf("bytes_read: %d, %d\n", bytes_read, ack_message);
     }
-    else
-      printf("Sent %i bytes", bytes_written);
 
-    fflush(stdout);
-    //wait 1 seconds
-    sleep(5);
+    if (bytes_read == 1 && ack_message == ACK_MESSAGE)
+    {
+      printf("Received ACK");
 
-    //free memory
-    free(imageBuffer);
-    free(filename);
+      readRawImage(filename, imageBuffer);
+      // Read bytes. The behaviour of read() (e.g. does it block?,
+      // how long does it block for?) depends on the configuration
+      // settings above, specifically VMIN and VTIME
+      int bytes_written = write(serial_port, imageBuffer, sizeof(uint8_t) * IMGWIDTH * IMGWIDTH);
+
+      // n is the number of bytes read. n may be 0 if no bytes were received, and can also be -1 to signal an error.
+      if (bytes_written < 0)
+      {
+        printf("Error sending message: %s", strerror(errno));
+        exit(1);
+      }
+      else
+        printf("Sent %d bytes", bytes_written);
+
+      fflush(stdout);
+      // wait 1 seconds
+      sleep(5);
+
+      // free memory
+      free(imageBuffer);
+      free(filename);
+    }
   }
-
-
 
   close(serial_port);
   return 0; // success

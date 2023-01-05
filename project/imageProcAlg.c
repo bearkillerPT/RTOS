@@ -347,7 +347,7 @@ int guideLineSearch(uint8_t imageBuf[IMGWIDTH][IMGWIDTH], int16_t *pos, float *a
 			pos_delta++;
 		else
 			pos_delta--;
-		*angle = acos(16 / sqrt(pow(16, 2) + pow(pos_delta, 2)));
+		*angle = acos(16 / sqrt(pow(IMGWIDTH, 2) + pow(pos_delta, 2)));
 		if (pos_delta > 0)
 			*angle = -*angle;
 	}
