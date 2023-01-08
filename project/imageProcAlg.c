@@ -335,7 +335,6 @@ int guideLineSearch(uint8_t imageBuf[IMGWIDTH][IMGWIDTH], int16_t *pos, float *a
 		return -1;
 	}
 
-	/* Approach very grossly the angle (NOT a valid solution - just for testing ) */
 	if (*pos == gf_pos)
 	{
 		*angle = 0;
@@ -343,13 +342,9 @@ int guideLineSearch(uint8_t imageBuf[IMGWIDTH][IMGWIDTH], int16_t *pos, float *a
 	else
 	{
 		int pos_delta = *pos - gf_pos;
-		if (pos_delta > 0)
-			pos_delta++;
-		else
-			pos_delta--;
-		*angle = acos(16 / sqrt(pow(16, 2) + pow(pos_delta, 2)));
-		if (pos_delta > 0)
-			*angle = -*angle;
+		float angle_step = M_PI / 4 / 63;
+		// calculate angle of the guideline 
+		*angle = -pos_delta * angle_step;
 	}
 
 	return 0;
@@ -419,17 +414,23 @@ int main()
 	int16_t pos;
 	float angle;
 
+	FILE* fp = fopen("imageBib/left64", "r");
+
+	// alloc and read the 128x128 int8_t 
+
+	uint8_t raw_image[IMGWIDTH][IMGWIDTH];
+	fread(raw_image, sizeof(uint8_t), IMGWIDTH * IMGWIDTH, fp);
 	printf("Test for image processing algorithms \n\r");
 
 	printf("Detecting position and guideline angle ...");
-	res = guideLineSearch(left_45_guide_image_data, &pos, &angle);
+	res = guideLineSearch(raw_image, &pos, &angle);
 	printf("Robot position=%d, guideline angle = %f\n\r", pos, angle);
 
 	printf("Detecting number of obstacles ...");
-	res = obstCount(left_45_guide_image_data);
+	res = obstCount(raw_image);
 	printf("%d obstacles detected\n\r", res);
 
 	printf("Detecting closeby obstacles ...");
-	res = nearObstSearch(left_45_guide_image_data);
+	res = nearObstSearch(raw_image);
 	printf("Closeby obstacles detected: %s\n\r", res == 1 ? "Yes" : "No");
 }
