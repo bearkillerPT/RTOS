@@ -342,9 +342,19 @@ int guideLineSearch(uint8_t imageBuf[IMGWIDTH][IMGWIDTH], int16_t *pos, float *a
 	else
 	{
 		int pos_delta = *pos - gf_pos;
+<<<<<<< HEAD
 		float angle_step = M_PI / 4 / 63;
 		// calculate angle of the guideline 
 		*angle = -pos_delta * angle_step;
+=======
+		if (pos_delta > 0)
+			pos_delta++;
+		else
+			pos_delta--;
+		*angle = acos(16 / sqrt(pow(IMGWIDTH, 2) + pow(pos_delta, 2)));
+		if (pos_delta > 0)
+			*angle = -*angle;
+>>>>>>> ad0cc5c21dd05ae6db1d5e3a987759fc191aa419
 	}
 
 	return 0;
