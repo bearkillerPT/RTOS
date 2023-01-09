@@ -2,14 +2,17 @@ CC =  gcc # Set the compiler
 L_FLAGS = -lrt -lm
 #C_FLAGS = -g
 
-all: imageProcAlg serialImage
+all: imageProcAlg serialTest cab
 .PHONY: all
 
 # Project compilation
 imageProcAlg: imageProcAlg.c
 	$(CC) $< -o $@ $(C_FLAGS) $(L_FLAGS)
 
-serialImage: serialImage.c
+serialTest: serialTest.c
+	$(CC) $< -o $@ $(C_FLAGS) $(L_FLAGS)
+
+cab: cab.c
 	$(CC) $< -o $@ $(C_FLAGS) $(L_FLAGS)
 
 
@@ -18,7 +21,7 @@ serialImage: serialImage.c
 clean:
 	rm -f *.c~ 
 	rm -f *.o
-	rm imageProcAlg serialImage
+	rm imageProcAlg serialTest cab
 
 # Some notes
 # $@ represents the left side of the ":"
