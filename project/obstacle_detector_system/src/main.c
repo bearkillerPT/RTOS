@@ -366,6 +366,7 @@ const struct device *uart_dev;       /* Pointer to device struct */
 static uint8_t rx_buf[RXBUF_SIZE];   /* RX buffer, to store received data */
 static uint8_t rx_chars[RXBUF_SIZE]; /* chars actually received  */
 volatile int filling_matrix = 0;     /* flag set while copying the matrix */
+volatile int ready_to_receive = 0;     /* flag set when ready to receive data */
 
 /* UART callback function prototype */
 static void uart_cb(const struct device *dev, struct uart_event *evt, void *user_data);
@@ -824,30 +825,44 @@ static void uart_cb(const struct device *dev, struct uart_event *evt, void *user
             break;
         }
         else
-        {
-            if (filling_matrix == 0 && evt->data.rx.len == 1)
+        {   
+            // receive handshake message and send ack
+            if (ready_to_receive == 0 && evt->data.rx.len == 1)
             {
                 if (rx_buf[evt->data.rx.offset] == HANDSHAKE_MESSAGE)
                 {
                     printk("Received handshake message. Sending ACK\n");
                     // send ackknowledgement
-                    // err = uart_tx(uart_dev, (uint8_t *)ACK_MESSAGE, sizeof(uint8_t), 100);
-                    // if (err)
-                    // {
-                    //     printk("uart_tx() error. Error code:%d\n\r", err);
-                    // }
-                    // else
-                    // {
-                    //     printk("Sent %d bytes\n", sizeof(uint8_t));
-                    //     filling_matrix = 1;
-                    // }
+                    err = uart_tx(uart_dev, (uint8_t *)ACK_MESSAGE, sizeof(uint8_t), 100);
+                    if (err)
+                    {
+                        printk("uart_tx() error. Error code:%d\n\r", err);
+                    }
+                    else
+                    {
+                        printk("Sent %d bytes\n", sizeof(uint8_t));
+                        ready_to_receive = 1;
+                    }
                 }
             }
+
+
+            //receive ack, start receiving image
+            else if(ready_to_receive == 1 && filling_matrix == 0){
+                if(evt->data.rx.len == 1 && rx_buf[evt->data.rx.offset] == ACK_MESSAGE){
+                    filling_matrix = 1;
+                    printk("Received ack message. Starting to receive image\n");
+                }
+            }
+            
+            
+            // receive image
             else if(filling_matrix == 1){
                 memcpy(&rx_chars[evt->data.rx.offset], &(rx_buf[evt->data.rx.offset]), evt->data.rx.len);
-                printk("Received %d bytes.\n", evt->data.rx.len);
+                // printk("Received %d bytes.\n", evt->data.rx.len);
                 if(evt->data.rx.offset + evt->data.rx.len == RXBUF_SIZE){
                     filling_matrix = 0;
+                    ready_to_receive = 0;
                     k_sem_give(&sem_rcvimg);
                 }
             }
