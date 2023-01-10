@@ -669,8 +669,6 @@ void thread_orientation_code(void *argA, void *argB, void *argC)
             float angle_step = M_PI / 2 / IMGWIDTH;
             // calculate angle of the guideline
             *angle = pos_delta * angle_step;
-            // the angle is in rad print it in degrees
-            printf("\nangle=%f\n", *angle * 180 / M_PI);
         }
 
         // write data on shared memory
