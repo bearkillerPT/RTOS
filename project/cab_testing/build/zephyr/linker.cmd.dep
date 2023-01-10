@@ -12,7 +12,7 @@ linker.cmd: /home/rt/ncs/zephyr/soc/arm/nordic_nrf/nrf52/linker.ld \
  /home/rt/ncs/zephyr/include/zephyr/sys/util_macro.h \
  /home/rt/ncs/zephyr/include/zephyr/sys/util_internal.h \
  /home/rt/ncs/zephyr/include/zephyr/sys/util_loops.h \
- /home/rt/ncs/zephyr/lib/libc/minimal/include/stdbool.h \
+ /home/rt/zephyr-sdk-0.14.1/arm-zephyr-eabi/lib/gcc/arm-zephyr-eabi/10.3.0/include/stdbool.h \
  /home/rt/ncs/zephyr/include/zephyr/devicetree/io-channels.h \
  /home/rt/ncs/zephyr/include/zephyr/devicetree/clocks.h \
  /home/rt/ncs/zephyr/include/zephyr/devicetree/gpio.h \

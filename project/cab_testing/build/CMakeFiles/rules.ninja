@@ -252,7 +252,7 @@ rule C_STATIC_LIBRARY_LINKER__arch__arm__core__aarch32__mpu_
 #############################################
 # Rule for compiling C files.
 
-rule C_COMPILER__lib__libc__minimal_
+rule C_COMPILER__lib__libc__newlib_
   depfile = $DEP_FILE
   deps = gcc
   command = ccache /home/rt/zephyr-sdk-0.14.1/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
@@ -262,7 +262,7 @@ rule C_COMPILER__lib__libc__minimal_
 #############################################
 # Rule for linking C static library.
 
-rule C_STATIC_LIBRARY_LINKER__lib__libc__minimal_
+rule C_STATIC_LIBRARY_LINKER__lib__libc__newlib_
   command = $PRE_LINK && ccache /usr/bin/cmake -E rm -f $TARGET_FILE && ccache /home/rt/zephyr-sdk-0.14.1/arm-zephyr-eabi/bin/arm-zephyr-eabi-ar qc $TARGET_FILE $LINK_FLAGS $in && ccache /home/rt/zephyr-sdk-0.14.1/arm-zephyr-eabi/bin/arm-zephyr-eabi-ranlib $TARGET_FILE && $POST_BUILD
   description = Linking C static library $TARGET_FILE
   restat = $RESTAT
