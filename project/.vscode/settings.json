@@ -1,12 +1,13 @@
 {
     "nrf-connect.applications": [
-        "${workspaceFolder}/obstacle_detector_system"
+        "${workspaceFolder}/cab_testing"
     ],
     "nrf-connect.topdir": "${nrf-connect.sdk:2.0.1}",
     "nrf-connect.toolchain.path": "PATH",
     "files.associations": {
         "stdio.h": "c",
         "stddef.h": "c",
-        "cab.h": "c"
+        "cab.h": "c",
+        "rand32.h": "c"
     }
 }
