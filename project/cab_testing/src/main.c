@@ -161,6 +161,7 @@ cab* image_cab;
 #define N_CONSUMERS 3
 
 K_THREAD_STACK_DEFINE(producer_stack, STACK_SIZE);
+K_THREAD_STACK_DEFINE(consumer_stack, STACK_SIZE);
 
 
 /* Thread code prototypes */
@@ -198,8 +199,8 @@ void main(void) {
 
     /* Initialize producer tasks*/
     // for(int i = 0; i < N_PRODUCERS; i++){
-        producers[0] = k_thread_create(producer_threads[i], &producers_stacks[i],
-        K_THREAD_STACK_SIZEOF(&producers_stacks[i]), producers_code,
+        producers[0] = k_thread_create(producer_threads[0], producer_stack,
+        K_THREAD_STACK_SIZEOF(producer_stack), producers_code,
         NULL, NULL, NULL, 1, 0, K_NO_WAIT);
         // printk("producer %d created\n", i);
     // }
@@ -207,23 +208,23 @@ void main(void) {
     printk("producers created\n");
 
     /*Initialize consumer tasks*/
-    for(int i = 0; i < N_CONSUMERS; i++){
-        consumers[i] = k_thread_create(consumer_threads[i], &consumers_stacks[i],
-        K_THREAD_STACK_SIZEOF(&consumers_stacks[i]), consumers_code,
+    // for(int i = 0; i < N_CONSUMERS; i++){
+        consumers[0] = k_thread_create(consumer_threads[0], consumer_stack,
+        K_THREAD_STACK_SIZEOF(consumer_stack), consumers_code,
         NULL, NULL, NULL, 1, 0, K_NO_WAIT);
-    }
+    // }
 
     printk("consumers created\n");
 
-    for(int i = 0; i < N_PRODUCERS; i++){
-        k_thread_join(producer_threads[i], K_FOREVER);
-    }
+    // for(int i = 0; i < N_PRODUCERS; i++){
+    //     k_thread_join(producer_threads[i], K_FOREVER);
+    // }
 
-    for(int i = 0; i < N_CONSUMERS; i++){
-        k_thread_join(consumer_threads[i], K_FOREVER);
-    }
+    // for(int i = 0; i < N_CONSUMERS; i++){
+    //     k_thread_join(consumer_threads[i], K_FOREVER);
+    // }
 
-    printk("joins done\n");
+    // printk("joins done\n");
 
     
     return;
@@ -255,6 +256,8 @@ void producers_code(void *argA , void *argB, void *argC)
 
         put_mes((void*)img, image_cab);
         printk("Task producer put image to CAB \n");
+
+        k_msleep(1000);
         
     }
 
@@ -314,6 +317,9 @@ void consumers_code(void *argA , void *argB, void *argC)
 
     /* unget image from CAB*/
     unget((void*)img, image_cab);
+
+    k_msleep(1000);
+
         
   }
 }
