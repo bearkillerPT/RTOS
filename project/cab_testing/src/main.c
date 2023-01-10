@@ -157,11 +157,25 @@ cab* image_cab;
 /* Size of stack area used by each thread (can be thread specific, if necessary)*/
 #define STACK_SIZE 1024
 
-#define N_PRODUCERS 3
-#define N_CONSUMERS 3
+#define N_PRODUCERS 1
+#define N_CONSUMERS 1
 
-K_THREAD_STACK_DEFINE(producer_stack, STACK_SIZE);
-K_THREAD_STACK_DEFINE(consumer_stack, STACK_SIZE);
+/* Create thread stack space */
+K_THREAD_STACK_DEFINE(p1_stack, STACK_SIZE);
+K_THREAD_STACK_DEFINE(c1_stack, STACK_SIZE);
+  
+/* Create variables for thread data */
+struct k_thread p1_data;
+struct k_thread c1_data;
+
+
+/* Create task IDs */
+k_tid_t p1_tid;
+k_tid_t c1_tid;
+
+
+K_THREAD_STACK_DEFINE(p1_stack, STACK_SIZE);
+K_THREAD_STACK_DEFINE(c1_stack, STACK_SIZE);
 
 
 /* Thread code prototypes */
@@ -186,45 +200,11 @@ void main(void) {
     image_cab = open_cab("image cab", N_PRODUCERS+N_CONSUMERS+1, IMGWIDTH*IMGWIDTH, (void*)img1);
     
     printk("Cab initialized\n");
-    k_tid_t* producers = (k_tid_t*)malloc(sizeof(k_tid_t)*N_PRODUCERS);
-    k_tid_t* consumers = (k_tid_t*)malloc(sizeof(k_tid_t)*N_CONSUMERS);
 
-    struct k_thread *producer_threads[N_PRODUCERS];
-    struct k_thread *consumer_threads[N_CONSUMERS];
-
-    k_thread_stack_t *producers_stacks = calloc(N_PRODUCERS, sizeof(k_thread_stack_t));
-    k_thread_stack_t *consumers_stacks = calloc(N_CONSUMERS, sizeof(k_thread_stack_t));
-
-    printk("stacks allocated\n");
-
-    /* Initialize producer tasks*/
-    // for(int i = 0; i < N_PRODUCERS; i++){
-        producers[0] = k_thread_create(producer_threads[0], producer_stack,
-        K_THREAD_STACK_SIZEOF(producer_stack), producers_code,
-        NULL, NULL, NULL, 1, 0, K_NO_WAIT);
-        // printk("producer %d created\n", i);
-    // }
-
-    printk("producers created\n");
-
-    /*Initialize consumer tasks*/
-    // for(int i = 0; i < N_CONSUMERS; i++){
-        consumers[0] = k_thread_create(consumer_threads[0], consumer_stack,
-        K_THREAD_STACK_SIZEOF(consumer_stack), consumers_code,
-        NULL, NULL, NULL, 1, 0, K_NO_WAIT);
-    // }
-
-    printk("consumers created\n");
-
-    // for(int i = 0; i < N_PRODUCERS; i++){
-    //     k_thread_join(producer_threads[i], K_FOREVER);
-    // }
-
-    // for(int i = 0; i < N_CONSUMERS; i++){
-    //     k_thread_join(consumer_threads[i], K_FOREVER);
-    // }
-
-    // printk("joins done\n");
+    p1_tid = k_thread_create(&p1_data, p1_stack, K_THREAD_STACK_SIZEOF(p1_stack), producers_code, NULL, NULL, NULL, 1, 0, K_NO_WAIT);
+    printk("Thread producer created \n");
+    c1_tid = k_thread_create(&c1_data, c1_stack, K_THREAD_STACK_SIZEOF(c1_stack), consumers_code, NULL, NULL, NULL, 1, 0, K_NO_WAIT);
+    printk("Thread consumer created \n");
 
     
     return;
